@@ -3,7 +3,7 @@
 #' and dnt.spls.ctrl.
 #' @param path this is the path to
 #' "DNT project sample sizes after SB corrections_use this one_BH edit.xlsx"
-upload.Chem <- function(path) {
+upload_Chem <- function(path) {
 
   #--------------#
   # Data upload
@@ -33,23 +33,35 @@ upload.Chem <- function(path) {
   dnt.chems <- rename(dnt.chems,
                           Chemical = Chemical.,
                           Tested = Bold.indicates.that.chemical.has.not.been.tested)
+  # return dnt.chems
+  assign("dnt.chems",
+         dnt.chems,
+         envir = globalenv())
 
   # format dnt.spls
-  # remove unnecessary columns
-  dnt.spls <- dnt.spls %>%
-    select(-contains("NA"))
+  dnt.spls <- dnt.spls[, -15]
   # format column names to work with dplyr
-  names(dnt.spls) <- c("Plate", "Chemical", "Conc", "P.Normal",
-                            "X.Tested", "Plate", "Chemical", "P.Normal",
-                            "X.Tested", "SB", "Other", "TrkPblms")
-  # divide into two dt's one for control and one for test
+  new_names <- c("Plate", "Chemical", "Conc", "X.Final", "P.Normal",
+                 "X.Tested", "Plate", "Chemical", "X.Final", "P.Normal",
+                 "X.Tested", "SB", "Other", "TrkPblms")
+  names(dnt.spls) <- new_names
+  rm(new_names)
+  # divide into two df's one for control and one for test
   # will be related by "Plate #" key
-  dnt.spls.test <- dnt.spls[, 1:5]
-  dnt.spls.ctrl <- dnt.spls[, 6:length(dnt.spls)]
-  rm(dnt.spls)
+  dnt.spls.test <- dnt.spls %>%
+    select(1:6)
+  dnt.spls.ctrl <- dnt.spls %>%
+    select(7:length(dnt.spls))
   # Remove blank entries
   dnt.spls.test <- dnt.spls.test %>%
-    filter(!is.na(Chemical))
+                    filter(!is.na(Chemical))
   dnt.spls.ctrl <- dnt.spls.ctrl %>%
-    filter(!is.na(Plate))
+                    filter(!is.na(Plate))
+  # return tables
+  assign("dnt.spls.test",
+         dnt.spls.test,
+         envir = globalenv())
+  assign("dnt.spls.ctrl",
+         dnt.spls.ctrl,
+         envir = globalenv())
 }
