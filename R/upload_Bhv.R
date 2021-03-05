@@ -13,10 +13,10 @@ upload_Bhv <- function(path){
 
   # behavioral data is grouped by tested chemical
   # each chemical has a unique sheet in xlsx file
-  sheetnames <<- excel_sheets(path)
+  sheetnames <<- readxl::excel_sheets(path)
   for (name in sheetnames){
-    sheet <- read_excel(path,
-                        sheet = name) %>%
+    sheet <- readxl::read_excel(path,
+                                sheet = name) %>%
               as.data.table()
     assign(name,
            sheet)
@@ -26,7 +26,7 @@ upload_Bhv <- function(path){
   for (name in sheetnames){
     sheet <- get(name)
     if (names(sheet)[10] == "...10") {
-      sheet <- read_excel(path,
+      sheet <- readxl::read_excel(path,
                           sheet = name,
                           skip = 1) %>%
                 as.data.table()
@@ -66,12 +66,12 @@ upload_Bhv <- function(path){
   # find columns where "SB" does not appear in first column
   sb_first <- grep("SB", var.table[1,], ignore.case = TRUE)
   var.table.change <- var.table %>%
-                        select(!sb_first)
+                        dplyr::select(!sb_first)
   # create loop that relocates Status variable
   for (name in names(var.table.change)){
     sheet <- get(name)
     sheet <- sheet %>%
-              relocate(Status)
+              dplyr::relocate(Status)
     assign(name,
            sheet)
   }
@@ -97,30 +97,30 @@ upload_Bhv <- function(path){
   ## Chloramben[, 6], Diethylene Glycol[, 55], Triethyl Tin[1, ]
   change_0002 <- c("Chloramben", "Triethyl Tin")
   change_98100 <- c("Diethylene Glycol")
+  # for (name in change_0002) {
+  #   sheet <- get(name)
+  #   sheet$t_02 <- as.numeric(sheet$t_02)
+  #   assign(name,
+  #          sheet)
+  # }
+  # for (name in change_98100) {
+  #   sheet <- get(name)
+  #   sheet$t_98100 <- as.numeric(sheet$t_98100)
+  #   assign(name,
+  #          sheet)
+  # }
   for (name in change_0002) {
     sheet <- get(name)
-    sheet$t_02 <- as.numeric(sheet$t_02)
+    sheet <- sheet[, t_02 := as.numeric(t_02)]
     assign(name,
            sheet)
   }
   for (name in change_98100) {
     sheet <- get(name)
-    sheet$t_98100 <- as.numeric(sheet$t_98100)
+    sheet <- sheet[, t_98100 := as.numeric(t_98100)]
     assign(name,
            sheet)
   }
-  #for (name in change_0002) {
-    #sheet <- get(name)
-    #sheet <- sheet[, t_02 := as.numeric(t_02)]
-    #assign(name,
-           #sheet)
-  #}
-  #for (name in change_98100) {
-    #sheet <- get(name)
-    #sheet <- sheet[, t_98100 := as.numeric(t_98100)]
-    #assign(name,
-           #sheet)
-  #}
   # some data sheets still contain mean, count, SEM data
   # identify these tables and remove these rows
   for (name in sheetnames) {

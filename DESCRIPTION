@@ -9,4 +9,9 @@ Description:Imports and formats bahavioral data. Creates endpoints and fits
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Imports: xlsx, readxl, data.table, tidyverse, tcpl
+Imports: 
+    data.table, 
+    readxl,
+    tidyverse, 
+    tcpl,
+    xlsx

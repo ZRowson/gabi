@@ -3,19 +3,18 @@
 #' and dnt.spls.ctrl.
 #' @param path this is the path to
 #' "DNT project sample sizes after SB corrections_use this one_BH edit.xlsx"
+#' @import data.table
 upload_Chem <- function(path) {
 
   #--------------#
   # Data upload
   #--------------#
 
-  dnt.chems <- read.xlsx(path,
-                             sheetName = "Chemical List") %>%
-                    as.data.table()
-  dnt.spls <- read.xlsx(path,
-                        sheetName = "Sample sizes",
-                        startRow = 2) %>%
-                as.data.table()
+  dnt.chems <- as.data.table(xlsx::read.xlsx(path,
+                                             sheetName = "Chemical List"))
+  dnt.spls <- as.data.table(xlsx::read.xlsx(path,
+                                            sheetName = "Sample sizes",
+                                            startRow = 2))
 
   #------------------------------------#
   # Data formatting and cleaning of
@@ -28,9 +27,9 @@ upload_Chem <- function(path) {
   dnt.chems$Bold.indicates.that.chemical.has.not.been.tested[which(dnt.chems$Chemical. %in% dnt.chems$NA.)] = 0
   #remove unnecessary columns
   dnt.chems <- dnt.chems %>%
-    select(-contains("NA"))
+                dplyr::select(-contains("NA"))
   #rename variables
-  dnt.chems <- rename(dnt.chems,
+  dnt.chems <- dplyr::rename(dnt.chems,
                           Chemical = Chemical.,
                           Tested = Bold.indicates.that.chemical.has.not.been.tested)
   # return dnt.chems
@@ -49,14 +48,14 @@ upload_Chem <- function(path) {
   # divide into two df's one for control and one for test
   # will be related by "Plate #" key
   dnt.spls.test <- dnt.spls %>%
-    select(1:6)
+                    dplyr::select(1:6)
   dnt.spls.ctrl <- dnt.spls %>%
-    select(7:length(dnt.spls))
+                    dplyr::select(7:length(dnt.spls))
   # Remove blank entries
   dnt.spls.test <- dnt.spls.test %>%
-                    filter(!is.na(Chemical))
+                    dplyr::filter(!is.na(Chemical))
   dnt.spls.ctrl <- dnt.spls.ctrl %>%
-                    filter(!is.na(Plate))
+                    dplyr::filter(!is.na(Plate))
   # return tables
   assign("dnt.spls.test",
          dnt.spls.test,
