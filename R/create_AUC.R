@@ -3,7 +3,7 @@
 #' spelled as they appear in
 #' "DNT project sample sizes after SB corrections_use this one_BH edit.xlsx"
 #' @import data.table
-create_SUM <- function (chemnames) {
+create_AUC <- function (chemnames) {
                 for (name in chemnames) {
                 sheet <- get(name) %>%
                           dplyr::filter(dplyr::across(c("t_02":"t_98100"), ~ !is.na(.x)))
