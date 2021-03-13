@@ -1,4 +1,6 @@
-#' This function creates endpoints and appends values to behavior data tables
+#' This function creates endpoints and appends values to behavior data tables.
+#' Endpoints created: AUC and SUM _L _D _T light, dark, total
+#' to be added: immediate response to light change, t-test, ANOVA
 #' @param chemnames this is a vector of chemical names as strings. Napmes are
 #'   spelled as they appear in "DNT project sample sizes after SB
 #'   corrections_use this one_BH edit.xlsx"
