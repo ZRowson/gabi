@@ -129,6 +129,7 @@ upload_Bhv <- function(path){
       assign(name, sheet[-grep("mean|count|sem", sheet$FinalConc, ignore.case = TRUE), ])
     }
   }
+
   for (name in sheetnames) {
     sheet <- get(name)
     assign(name,

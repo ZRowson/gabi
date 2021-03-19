@@ -1,7 +1,7 @@
 #' This function creates endpoints and appends values to behavior data tables.
 #' Endpoints created: AUC and SUM _L _D _T light, dark, total
 #' to be added: immediate response to light change, t-test, ANOVA
-#' @param chemnames this is a vector of chemical names as strings. Napmes are
+#' @param chemnames this is a vector of chemical names as strings. Names are
 #'   spelled as they appear in "DNT project sample sizes after SB
 #'   corrections_use this one_BH edit.xlsx"
 #' @import data.table
@@ -17,21 +17,27 @@ create_Endp <- function (chemnames) {
                   # Create aggregate movement endpoints, SUM and AUC, over dark, light, and total time intervals
                   # Create matrix of endpoint titles and their corresponding interval
                   title <- c("SUM_L", "SUM_D", "SUM_T", "AUC_L", "AUC_D", "AUC_T")
-                  interval <- rep(list(names(`sheet`)[16:35], names(`sheet`)[36:55], names(`sheet`)[16:55]),
-                                  2)
+                  interval <- rep(list(names(`sheet`)[16:35], names(`sheet`)[36:55], names(`sheet`)[16:55]), 2)
                   endpoints <- as.matrix(cbind(title, interval))
                   # Create SUM endpoints
-                  invisible(apply(endpoints, 1, function(endp) {
-                                                  `sheet`[, endp$`title`:=rowSums(.SD), .SDcols=endp$`interval`]}))
+                  invisible(apply(endpoints, 1,
+                                  function(endp) {`sheet`[, endp$`title`:=rowSums(.SD), .SDcols=endp$`interval`]}))
                   # Create AUC endpoints
                   invisible(apply(endpoints[4:6,], 1,
                                   function(endp) {
                                     `sheet`[, endp$`title`:=
                                                 (rowSums(.SD[, endp$`interval`[3:length(endp$`interval`)-1], with=FALSE])+
                                                 (0.5*rowSums(.SD[, endp$`interval`[c(1,length(endp$`interval`))], with=FALSE]))),
-                                    .SDcols=endp$interval]}))
+                                            .SDcols=endp$interval]}))
                   assign(name,
                          sheet,
                          envir = globalenv())
+
+                  #------------------------------
+                  # Immediate change in activity
+                  #------------------------------
+
+                  # Can do this a couple ways, simply calculate the difference between the two values or you could see how much
+                  # the value changes relative to the amount fish were already moving
                 }
               }
