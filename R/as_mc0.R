@@ -21,10 +21,11 @@ as_mc0 <- function(chemnames, endp) {
     mc0[, `:=` (acid = endp, wllt="t", wllq=0, rowi=substring(Well,1,1), coli=substring(Well,2), srcf="All Chemicals one per sheet.xlsx") #1
          ][Chemical == "DMSO"|Chemical == "Water", wllt := "v"
            ][is.na(get(endp)), wllt := 0
-             ][is.na(SB)|SB == "Normal"|SB == "X", wllq := 1
+             ][is.na(SB)|SB == "Normal", wllq := 1 # I need to check that some data sheets don't notate morphological normality another way
                ][, `:=` (rowi = match(rowi, LETTERS), coli = as.integer(coli), FinalConc = as.numeric(FinalConc))] #2
     setnames(mc0, c("Chemical","Plate","FinalConc",endp), c("cpid","apid","conc","rval")) #3
     mc0 <- mc0[!is.na(conc), .(acid, cpid, apid, rowi, coli, wllt, wllq, conc, rval, srcf)] #4
+    mc0 <- unique(mc0) # Eliminates duplicate controls
     return(mc0)
   }
 }
