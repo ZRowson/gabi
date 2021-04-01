@@ -26,6 +26,8 @@ as_mc0 <- function(chemnames, endp) {
     setnames(mc0, c("Chemical","Plate","FinalConc",endp), c("cpid","apid","conc","rval")) #3
     mc0 <- mc0[!is.na(conc), .(acid, cpid, apid, rowi, coli, wllt, wllq, conc, rval, srcf)] #4
     mc0 <- unique(mc0) # Eliminates duplicate controls
+
+    # Remove concentration groups and control groups that do not meet quality thresholds
     return(mc0)
   }
 }

@@ -96,7 +96,7 @@ upload_Bhv <- function(path){
   # To change
   ## Chloramben[, 6], Diethylene Glycol[, 55], Triethyl Tin[1, ]
   change_0002 <- c("Chloramben", "Triethyl Tin")
-  change_98100 <- c("Diethylene Glycol")
+  change_98100 <- c("Diethylene Glycol (#75)")
   # for (name in change_0002) {
   #   sheet <- get(name)
   #   sheet$t_02 <- as.numeric(sheet$t_02)
@@ -127,6 +127,11 @@ upload_Bhv <- function(path){
     sheet <- get(name)
     if (length(grep("mean|count|sem", sheet$FinalConc, ignore.case = TRUE)) > 0) {
       assign(name, sheet[-grep("mean|count|sem", sheet$FinalConc, ignore.case = TRUE), ])
+    }
+    # Remove bad concentrations
+    if (name %in% unique(dnt.spls.test[P.Normal<75, Chemical])) {
+      concs <- unique(dnt.spls.test[P.Normal<75][Chemical==name, Conc])
+      assign(name, sheet[!(FinalConc %in% concs)])
     }
   }
 
