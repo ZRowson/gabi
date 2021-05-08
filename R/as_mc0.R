@@ -5,7 +5,7 @@
 #' @param chemnames vector of chemical names as strings
 #' @param endp string name of endpoint to saved as rval
 #' @import data.table
-as_mc0 <- function(chemnames, endp) {
+as_mc0 <- function(chemnames, endp) { # Think about changinging this so that it produces an mc0 like matrix with all endpoints
   for (name in chemnames) {
     # Create large table
     mc0 <- data.table()
@@ -26,8 +26,10 @@ as_mc0 <- function(chemnames, endp) {
     setnames(mc0, c("Chemical","Plate","FinalConc",endp), c("cpid","apid","conc","rval")) #3
     mc0 <- mc0[!is.na(conc), .(acid, cpid, apid, rowi, coli, wllt, wllq, conc, rval, srcf)] #4
     mc0 <- unique(mc0) # Eliminates duplicate controls
+    # Remove test concentration groups that do not meet quality thresholds
+    remove <- mc0[cpid!="DMSO" & cpid!="Water",.(sum=(sum(wllt=="t")/sum(wllt=="t"|wllt=="0"))),by=.(cpid,conc)][sum<.75, .(cpid,conc)]
+    mc0 <- mc0[!remove, on = .(cpid=cpid, conc=conc)]
 
-    # Remove concentration groups and control groups that do not meet quality thresholds
     return(mc0)
   }
 }

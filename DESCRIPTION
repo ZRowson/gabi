@@ -12,6 +12,10 @@ LazyData: true
 Imports: 
     data.table, 
     readxl,
-    tidyverse, 
+    magrittr, 
     tcpl,
-    xlsx
+    stringr,
+    stats,
+    grDevices,
+    RColorBrewer,
+    graphics

@@ -4,6 +4,7 @@
 #' chemical and it's corresponding control. These worksheets are imported as
 #' data.tables and are named by the test chemical they describe.
 #' @param path this is the path to "All Chemicals one per sheet.xlsx"
+#' @import data.table
 
 upload_Bhv <- function(path){
 
@@ -13,14 +14,16 @@ upload_Bhv <- function(path){
 
   # behavioral data is grouped by tested chemical
   # each chemical has a unique sheet in xlsx file
-  sheetnames <<- readxl::excel_sheets(path)
-  for (name in sheetnames){
-    sheet <- readxl::read_excel(path,
-                                sheet = name) %>%
-              as.data.table()
-    assign(name,
-           sheet)
-  }
+  chemnames <<- readxl::excel_sheets(path)
+  lapply(chemnames, function(chm) {
+    assign(chm,
+           as.data.table(readxl::read_excel(path, sheet = name))
+    )
+  })
+  # for (name in sheetnames){
+  #   sheet <- as.data.table(readxl::read_excel(path, sheet = name))
+  #   assign(name, sheet)
+  # }
   rm(name)
   # some sheets had column names in the first row. Re-upload those sheets
   for (name in sheetnames){
@@ -127,11 +130,6 @@ upload_Bhv <- function(path){
     sheet <- get(name)
     if (length(grep("mean|count|sem", sheet$FinalConc, ignore.case = TRUE)) > 0) {
       assign(name, sheet[-grep("mean|count|sem", sheet$FinalConc, ignore.case = TRUE), ])
-    }
-    # Remove bad concentrations
-    if (name %in% unique(dnt.spls.test[P.Normal<75, Chemical])) {
-      concs <- unique(dnt.spls.test[P.Normal<75][Chemical==name, Conc])
-      assign(name, sheet[!(FinalConc %in% concs)])
     }
   }
 
