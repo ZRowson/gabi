@@ -21,7 +21,7 @@
 #'     \item wllq - well quality indicates if observation is viable for analysis
 #'       1 = yes, 0 = no
 #'     \item conc - concentration of chemical
-#'     \item tj - measurements at time period j for j /in {1,2,...,n}
+#'     \item vtj - measurements at time period j for j /in {1,2,...,n}
 #'       Here n = 50
 #'   }
 #' @param rval is the name of desired endpoint as a string
@@ -46,7 +46,7 @@
 as_mc02 <- function(table, rval = NULL) {
             tablewENDP <- DNT.60.Analysis::create_endp(table)
             endp <- tablewENDP[[rval]]
-            tablewENDP[["rval"]] <- endp
+            tablewENDP[["rval"]] <- endp # This is a very round-about way of renaming endpoint column. Edit this
 
             acid <- unique(tablewENDP[, acid])
             newacid <- paste(rval, acid, sep = "_")

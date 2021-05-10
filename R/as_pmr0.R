@@ -22,7 +22,7 @@
 #'     \item wllq - well quality indicates if observation is viable for analysis
 #'       1 = yes, 0 = no
 #'     \item conc - concentration of chemical
-#'     \item tj - measurements at time period j for j /in {1,2,...,n}
+#'     \item vtj - measurements at time period j for j /in {1,2,...,n}
 #'       Here n = 50
 #'   }
 #'
