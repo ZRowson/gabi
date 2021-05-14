@@ -28,8 +28,9 @@
 #'
 #'   @import data.table
 
-upload_DNT60 <- function(path) {
+upload_DNT60 <- function(path) { # This function prints warnings from data.table. Figure out why and fix it
                     sheetnames <- readxl::excel_sheets(path)
+                    names(sheetnames) <- sheetnames
                   # Upload all sheets from .xlsx file as data.tables
                     tables <- lapply(sheetnames,
                                      function(sheet) {

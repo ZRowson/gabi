@@ -44,12 +44,19 @@
 #'
 #'   @import data.table
 as_mc02 <- function(table, rval = NULL) {
-            tablewENDP <- DNT.60.Analysis::create_endp(table)
-            endp <- tablewENDP[[rval]]
-            tablewENDP[["rval"]] <- endp # This is a very round-about way of renaming endpoint column. Edit this
+            # Create endpoints and isolate user-specified endpoint
+              endpnts <- DNT.60.Analysis::create_endp(table)
+              endpnts[, rval := get(rval)]
 
-            acid <- unique(tablewENDP[, acid])
-            newacid <- paste(rval, acid, sep = "_")
-            mc0 <- tablewENDP[, .(srcf, acid = newacid, cpid, apid, rowi, coli, wllt, wllq, conc, rval)]
+            # Change assay component id
+              acid <- unique(endpnts[, acid])
+              newacid <- paste(rval, acid, sep = "_")
+
+            # Remove test concentration groups that do not meet quality thresholds
+            # Threshold: sample proportion of good quality test subjects = 0.75
+              remove <- endpnts[wllt == "t", .(p.hat = (sum(wllq==1) / .N)), by = .(cpid,conc)][p.hat < .75, .(cpid, conc)]
+              mc0 <- endpnts[!remove, on = .(cpid=cpid, conc=conc)]
+
+            mc0 <- mc0[, .(srcf, acid = newacid, cpid, apid, rowi, coli, wllt, wllq, conc, rval)]
             return(mc0)
 }
