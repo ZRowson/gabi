@@ -38,7 +38,8 @@ data_egids <- function(data) {
                     chm.plts <- table[wllt == "t", .(apids = .(unique(c(apid)) %>%
                                                                  sort()
                                                                )
-                                                     ), by = cpid]
+                                                    ), by = cpid
+                                      ]
                   # Find unique plate groups. Some chemicals were tested together
                     grps <- unique(chm.plts[, apids])
                   # Concatenate names of chemicals tested together into vectors
@@ -48,9 +49,10 @@ data_egids <- function(data) {
                                 }
                               )
 
-                  # Create and return a data.table of group number, chemicals in
-                  #   that group, and plates in that group
+                  # Create and return data with column of egids
                     exp_groups <- data.table(egid = paste0("E", seq(1:length(grps))),
                                              cpids, apids = grps)
-                    return(exp_groups)
+                    mapper <- exp_groups[, .(apid = unlist(apids)), by = egid]
+                    t_w_egids <- table[mapper, on = "apid"]
+                    return(t_w_egids)
                 }

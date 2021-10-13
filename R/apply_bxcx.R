@@ -6,7 +6,9 @@
 #' Applies Box-Cox power transformation to mc0 rval with goal
 #' of normalizing data. Requires estimating an optimal
 #' lambda paramater, lambda.hat. Lambda.hat is chosen via
-#' MLE estimation using control data.
+#' MLE estimation using control data. Shift parameter is
+#' included if data is less than or equal to 0. Shift
+#' parameter equals floor(minimum observed rval).
 #'
 #' @param data is a mc0 dataset formatted as below.
 #'   \itemize{
@@ -35,21 +37,25 @@ apply_bxcx <- function(data) {
                 # Linear model has form rval ~ egid where egid is the experimental
                 #   group id of a vehicle control sample
                   # Find experimental groups
-                  egroups <- DNT.60.Analysis::data_egids(table)
-                  # Use apids to map animals to a group number
-                  mapper <- egroups[, .(apid = unlist(apids)), by = egid]
-                  tester <- table[mapper, on = "apid"]
+                  tester <- DNT.60.Analysis::data_egids(table)
                   # Estimate lambda
-                  lam.hat <- DNT.60.Analysis::calc_lamhat(tester)
+                  list2env(DNT.60.Analysis::calc_lamhat(tester),
+                           envir = environment()
+                           )
 
                 # Transform data
+                  # Apply Box-Cox
                   if (is.null(lam.hat) | is.na(lam.hat)) {
                     stop("Error in DNT.60.Analysis::calc_lamhat()")
                   } else if (lam.hat == 0) {
-                      table[, rval := log10(rval)]
+                      table[, rval := log10(rval + shift)]
                   } else if (lam.hat != 0) {
-                      table[, rval := (((rval^lam.hat)-1)/lam.hat)]
+                      table[, rval := ((((rval+shift)^lam.hat)-1)/lam.hat)]
                   } else print("Error")
 
-                return(table)
+                return(list(data = table,
+                            lam.hat = lam.hat,
+                            shift = shift
+                            )
+                       )
               }

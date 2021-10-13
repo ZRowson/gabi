@@ -4,7 +4,7 @@ Title: Analyzes Padilla Lab DNT-60 behavioral data.
 Version: 0.1.0
 Author: Zachary Rowson
 Maintainer: Zachary Rowson <Rowson.Zachary@epa.gov>
-Description:Imports and formats bahavioral data. Creates endpoints and fits 
+Description: Imports and formats bahavioral data. Creates endpoints and fits 
     concentration response curves.
 License: What license is it under?
 Encoding: UTF-8
@@ -20,3 +20,4 @@ Imports:
     grDevices,
     RColorBrewer,
     graphics
+RoxygenNote: 7.1.1

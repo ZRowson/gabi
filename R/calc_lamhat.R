@@ -3,8 +3,8 @@
 #'   Rowson.Zachary at epa.gov
 #'   Last edit: 05/14/2021
 #'
-#' Calcualtes lambda.hat for data by finding optimal lambda
-#' fro vehicle control. I need to elaborate on this further.
+#' Calculates parameters for Box-Cox power transformation from data. Uses
+#' MLE estimation based on residuals of linear model (rval + shift ~ egid).
 #'
 #' @param data is a mc0 dataset with experimental group id's
 #' formatted as below.
@@ -24,18 +24,30 @@
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoint of interest
 #'   }
-#' @return MLE for lambda of Box-Cox transform.
+#' @return \itemize {
+#'           \item lam.hat - MLE for lambda of Box-Cox transform.
+#'           \item shift - shift to avoid rvals less than or equal to zero.
+#'         }
 #'
 #' @import data.table
 calc_lamhat <- function (data) {
                   # Isolate vehicle control animals
                     table <- data[wllt == "v"]
                   # Create linear model and estimate optimal lambda
-                    lklhd <- MASS::boxcox(rval ~ egid, data = table,
+                    if (any(table[,rval] < 0, na.rm = TRUE)) {
+                      shift <- min(table[, rval], na.rm = TRUE) %>%
+                                floor() * (-1)
+                    }  else if (any(table[,rval] == 0, na.rm = TRUE)) {
+                      shift <- 1
+                    } else shift <- 0
+
+                    lklhd <- MASS::boxcox(rval+shift ~ egid, data = table,
                                          lambda = seq(-3, 3, by = 0.25),
                                          plotit = FALSE
                             )
                     lam.hat <- lklhd$x[which.max(lklhd$y)]
 
-                  return(lam.hat)
+                  return(list(lam.hat = lam.hat,
+                              shift = shift)
+                         )
                 }

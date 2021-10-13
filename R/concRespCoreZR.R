@@ -65,7 +65,7 @@ concRespCoreZR <- function(row,
                          bmd_low_bnd = NULL,
                          bmd_up_bnd = NULL) {
   # variable binding to pass cmd checks
-  bmed <- cutoff <- onesd <- NULL
+  bmed <- cutoff <- onesd <- plot <- NULL
   # row needs to include cutoff and bmed
   # unpack row into the local environment, for ease: sample_id, dtxsid, casrn, name, time, pathway, size, con, resp
   list2env(row, envir = environment())
@@ -92,11 +92,11 @@ concRespCoreZR <- function(row,
   summary <- tcplfit2::tcplhit2_core(params, conc, resp, cutoff, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
   # Create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
-    DNT.60.Analysis::tcplggplotter(resp, bresp, logc, rmds, bmed, params, summary)
+    plot <- DNT.60.Analysis::tcplggplotter(resp, bresp, logc, rmds, bmed, params, summary)
   }
   if (return.details) {
-    return(list(summary = summary, all.models = params))
+    return(list(summary = summary, all.models = params, plot = plot))
   } else {
-    return(list(summary = summary))
+    return(list(summary = summary, plot = plot))
   }
 }

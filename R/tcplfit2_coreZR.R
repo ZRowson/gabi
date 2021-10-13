@@ -1,8 +1,16 @@
 #' Concentration-response curve fitting EDIT by Zachary Rowson
 #'
-#' Edit of original tcplfit2 function by Zachary Rowson (Rowson.Zachary#epa.gov)
-#' Concentration response curve fitting using the methods from BMDExpress
+#' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
+#' Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
+#' remove default plotting method provided by tcplfit2. Replaces plotting method
+#' with declaration of a logical to be passed to DNT.60.Analysis::concRespCoreZR
+#' wrapper function to determine if DNT.60.Analysis::tcplggplotter should be run.
+#'
+#' @details
+#' Last edit: 06/02/2021
+#' Roxygen created this manual page on `r Sys.Date()` using R version
+#' `r getRversion()`.
 #' All models are equal to 0 at 0 concentration (zero background).
 #' To add more models in the future, write a fit____ function, and add the model
 #' name to the fitmodels and modelnames vectors.
@@ -24,6 +32,7 @@
 #'
 #' @import graphics
 #'
+#' @return can.plot - logical indicating if plotting is possible
 #' @return List of N(models) elements, one for each of the models run (up to 10),
 #' followed by a last element "modelnames", which is a  vector of model names so
 #' other functions can easily cycle through the output. For a full list, see the

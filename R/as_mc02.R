@@ -10,7 +10,7 @@
 #' @param table is a pmr0 dataset formatted as below
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
+#'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
 #'       Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
@@ -43,20 +43,21 @@
 #'   }
 #'
 #'   @import data.table
-as_mc02 <- function(table, rval = NULL) {
-            # Create endpoints and isolate user-specified endpoint
-              endpnts <- DNT.60.Analysis::create_endp(table)
-              endpnts[, rval := get(rval)]
+as_mc02 <- function(data, rval = NULL) {
+              table <- data.table::copy(data)
+              # Calculate user-specified endpoint
+                endp <- DNT.60.Analysis::calc_endp(table, rval = rval)
+                table[, rval := endp]
 
-            # Change assay component id
-              acid <- unique(endpnts[, acid])
-              newacid <- paste(rval, acid, sep = "_")
+              # Change assay component id
+                acid <- unique(table[, acid])
+                newacid <- paste(rval, acid, sep = "_")
 
-            # Remove test concentration groups that do not meet quality thresholds
-            # Threshold: sample proportion of good quality test subjects = 0.75
-              remove <- endpnts[wllt == "t", .(p.hat = (sum(wllq==1) / .N)), by = .(cpid,conc)][p.hat < .75, .(cpid, conc)]
-              mc0 <- endpnts[!remove, on = .(cpid=cpid, conc=conc)]
+              # Remove test concentration groups that do not meet quality thresholds
+              # Threshold: sample proportion of good quality test subjects = 0.75
+                remove <- table[wllt == "t", .(p.hat = (sum(wllq==1) / .N)), by = .(cpid,conc)][p.hat < .75, .(cpid, conc)]
+                mc0 <- table[!remove, on = .(cpid=cpid, conc=conc)]
 
-            mc0 <- mc0[, .(srcf, acid = newacid, cpid, apid, rowi, coli, wllt, wllq, conc, rval)]
-            return(mc0)
+              mc0 <- mc0[, .(srcf, acid = newacid, cpid, apid, rowi, coli, wllt, wllq, conc, rval)]
+              return(mc0)
 }

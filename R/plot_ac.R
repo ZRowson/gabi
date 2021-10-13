@@ -1,0 +1,70 @@
+#' Plot Endpoint Distributions by Concentration Group as Scatter Plots
+#'
+#' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
+#'
+#' @description
+#' Plots endpoint data for a specific chemical and corresponding control
+#' as scatter-plots grouped by chemical concentration. Takes as arguments
+#' data in mc0 format and a chemical name.
+#'
+#' @details
+#' Created: 10/12/2021
+#' Last edit: 10/12/2021
+#'
+#' Scatter-plots are provided rather than box-plots or violin-plots to provide
+#' as much transparency as possible as to how data appear. This action is in
+#' concordance with Martin C. Michel et. al. 2020,
+#' *New Author Guidelines for Displaying Data and Reporting Data Analysis and Statistical Methods in Experimental Biology*.
+#'
+#' @param mc0 - is a mc0 dataset formatted as below
+#'   \itemize{
+#'     \item srcf - name of file holding raw data
+#'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
+#'       Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item cpid - chemical name
+#'     \item apid - assay plate id DNT###
+#'     \item rowi - row on plate
+#'     \item coli - column on plate
+#'     \item wllt - well type according to tcpl mc0 format
+#'      t = test, v = vehicle control
+#'     \item wllq - well quality indicates if observation is viable for analysis
+#'      1 = yes, 0 = no
+#'     \item conc - concentration of chemical
+#'     \item rval - endpoint values for fish
+#'   }
+#'
+#' @param chemical - string corresponding to name of chemical of interest
+#' @param unit.conc - unit of chemical concentration. Defaults to $\mu$M
+#' @param plot.log - boolean indicator of whether or not concentrations should be plotted on a
+#' logarithmic, base 10, scale. Defaults to TRUE
+#'
+#' @return A ggplot2 object displaying scatterplots of endpoint values grouped by concentration
+#'
+#' @import ggplot2
+#' @import data.table
+plot_acdist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"),plot.log = TRUE) {
+
+                # isolate data of interest and plot
+
+                ## find egid related to chemical to gather test fish and vehicle control
+  data <- data_egids(mc0[[1]])
+  group <- unique(data[cpid == chemical, egid])
+  to.fit <- data[cpid==chemical | (wllt=="v"&egid==group)]
+  conc <- unique(to.fit[wllt == "t", conc])
+  new.conc <- min(conc) / 10
+  to.fit[wllt == "v", conc := new.conc]
+
+  ## plot jitter-plots by concentration of test chemical
+  ggplot(data = to.fit, aes(x = log10(conc), y = rval)) +
+    geom_violin(aes(fill = as.factor(conc))) +
+    stat_summary(fun=median, geom="point", shape=23, size=4) +
+    geom_boxplot(aes(group = conc)) +
+    geom_dotplot(binaxis = 'y', stackdir = 'center', position = position_dodge(1),
+                 aes(group = conc), binwidth = 0.1)
+
+  data <- data_egids(mc0_n[[1]][[1]])
+  group <- unique(data[cpid == chemical, egid])
+  to.fit <- data[cpid==chemical | (wllt=="v"&egid==group)]
+
+
+}

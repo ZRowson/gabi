@@ -53,7 +53,7 @@ as_pmr0 <- function(data) {
 
               # Add pmr0 formatted columns to table
                 srcf <- "All Chemicals one per sheet.xlsx"
-                acid <- "ZFpmrA/L/D-20-40-40"
+                acid <- "ZFpmrALD-20-40-40"
                 table[, `:=` (srcf = srcf, acid = acid)]
                 # Create rowi and coli columns by separating rowcol
                 rowcol <- table[[dptrs[["rowcol"]]]]
