@@ -1,7 +1,7 @@
 #' Format chemical data into tcpl row object for tcpl analysis
 #'   Zachary Rowson
 #'   Rowson.Zachary at epa.gov
-#'   Last edit: 05/18/2021
+#'   Last edit: 08/27/2021
 #'
 #' Formats a chemical data from a mc0 dataset into a row
 #' object for tcpl analysis. Row objects are lists of
@@ -38,34 +38,38 @@
 #'   }
 #'
 #'   @import data.table
-as_row_draft <- function(data, chemical) {
-                  table <- DNT.60.Analysis::data_egids(data)
+as_row2 <- function(data, chemical, method = "MAD") {
+            table <- gabi::data_egids(data)
 
-                  # Consolidate necessary data
-                    assay <- table[cpid == chemical, acid] %>% unique()
-                    group <- table[cpid == chemical & !is.na(rval), egid] %>% unique()
-                    rval <- table[cpid == chemical & !is.na(rval), rval]
-                    conc <- table[cpid == chemical & !is.na(rval), conc]
-                    brval <- table[wllt == "v" & egid == group & !is.na(rval), rval]
+            # Consolidate necessary data
+              assay <- table[cpid == chemical, acid] %>% unique()
+              group <- table[cpid == chemical & !is.na(rval), egid] %>% unique()
+              concrval <- table[(cpid==chemical|wllt =="v") & egid == group & !is.na(rval), .(conc, rval)]
+              # new.conc <- min(concrval[conc != 0, conc])/1000
+              # concrval[conc == 0, conc := new.conc]
+              brval <- table[wllt == "v" & egid == group & !is.na(rval), rval]
 
-                  # Transform data
-                    bmed <- stats::median(brval)
-                    resp <- (rval - bmed) / bmed
-                    bresp <- (brval - bmed) / bmed
+            # Transform data
+              bmed <- mean(brval)
+              resp <- concrval[conc != 0, rval] - bmed
+              bresp <- brval - bmed
 
-                  # Create summary statistics
-                    bmed <- stats::median(bresp)
-                    onesd <- stats::sd(bresp)
-                    cutoff <- 2*stats::sd(bresp)
+            # Calculate cutoff
+              bsd <- stats::sd(bresp)
+              bvar <- bsd^2
+              nc <- length(bresp)
+              nt <- min(table(concrval$conc))
+              onesd <- sqrt((bvar/nc) + (bvar/nt))
+              cutoff <- 3*onesd
 
-                  # Generate and assign row vector
-                    row <- list(conc = conc,
-                                resp = resp,
-                                bresp = bresp,
-                                bmed = bmed,
-                                onesd = onesd,
-                                cutoff = cutoff,
-                                name = chemical,
-                                assay = assay)
-                  return(row)
-                }
+            # Generate and assign row vector
+              row <- list(conc = concrval[conc!=0, conc],
+                          resp = resp,
+                          bresp = bresp,
+                          bmed = bmed,
+                          onesd = onesd,
+                          cutoff.int = c(-cutoff, cutoff),
+                          name = chemical,
+                          assay = assay)
+            return(row)
+          }

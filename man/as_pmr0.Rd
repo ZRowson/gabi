@@ -36,5 +36,5 @@ A pmr0 format data.table
 \description{
 Formats a US EPA ORD CCTE BCTD RADB Padilla lab DNT60 data
 set into pmr0 format. pmr0 format is easily transformed
-into mc0 with DNT.60.Analysis::as_mc0() for tcpl analysis.
+into mc0 with gabi::as_mc0() for tcpl analysis.
 }

@@ -1,7 +1,7 @@
 #' Apply Box-Cox transformation to rval
 #'   Zachary Rowson
 #'   Rowson.Zachary at epa.gov
-#'   Last edit: 05/14/2021
+#'   Last edit: 08/30/2021
 #'
 #' Applies Box-Cox power transformation to mc0 rval with goal
 #' of normalizing data. Requires estimating an optimal
@@ -14,7 +14,7 @@
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'       Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -37,16 +37,16 @@ apply_bxcx <- function(data) {
                 # Linear model has form rval ~ egid where egid is the experimental
                 #   group id of a vehicle control sample
                   # Find experimental groups
-                  tester <- DNT.60.Analysis::data_egids(table)
+                  tester <- gabi::data_egids(table)
                   # Estimate lambda
-                  list2env(DNT.60.Analysis::calc_lamhat(tester),
+                  list2env(gabi::calc_lamhat(tester),
                            envir = environment()
                            )
 
                 # Transform data
                   # Apply Box-Cox
                   if (is.null(lam.hat) | is.na(lam.hat)) {
-                    stop("Error in DNT.60.Analysis::calc_lamhat()")
+                    stop("Error in gabi::calc_lamhat()")
                   } else if (lam.hat == 0) {
                       table[, rval := log10(rval + shift)]
                   } else if (lam.hat != 0) {

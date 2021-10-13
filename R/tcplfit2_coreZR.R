@@ -4,8 +4,8 @@
 #'
 #' Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
 #' remove default plotting method provided by tcplfit2. Replaces plotting method
-#' with declaration of a logical to be passed to DNT.60.Analysis::concRespCoreZR
-#' wrapper function to determine if DNT.60.Analysis::tcplggplotter should be run.
+#' with declaration of a logical to be passed to gabi::concRespCoreZR
+#' wrapper function to determine if gabi::tcplggplotter should be run.
 #'
 #' @details
 #' Last edit: 06/02/2021
@@ -81,8 +81,9 @@ tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, 
   for (model in modelnames) {
     # only fit when four or more concentrations, the model is in fitmodels, and
     # ( either one response is above cutoff OR force.fit == T OR it's the constant model.)
-    to.fit <- (length(rmds) >= 4 && model %in% fitmodels && (length(which(abs(rmds) >= cutoff)) > 0 || force.fit ||
-                                                               model == "cnst"))
+    # to.fit <- (length(rmds) >= 4 && model %in% fitmodels && (length(which(abs(rmds) >= cutoff)) > 0 || force.fit ||
+    #            model == "cnst"))
+    to.fit <- TRUE
     fname <- paste0("fit", model) # requires each model function have name "fit____" where ____ is the model name
     # use do.call to call fit function; cnst has different inputs than others.
     assign(model, do.call(fname, list(
@@ -99,13 +100,12 @@ tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, 
         assign(model, append(get(model), list(top = get(model)$tp)))
         assign(model, append(get(model), list(ac50 = get(model)$ga)))
       } else if (model == "gnls") {
-        # gnls methods; use calculated top/ac50, etc.
         assign(model, append(get(model), list(top = acy(0, get(model), type = model, returntop = T))))
         assign(model, append(get(model), list(ac50 = acy(.5 * get(model)$top, get(model), type = model))))
         assign(model, append(get(model), list(ac50_loss = acy(.5 * get(model)$top, get(model), type = model, getloss = T))))
       }
     }
-
+    assign(model, append(get(model), list(func = gabi::tcplfit2_funcfitZR(model, fit=get(model))))) # Attach function form to model
   }
   # optionally print out AICs
   if (verbose) {

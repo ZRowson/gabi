@@ -53,5 +53,5 @@ A mc0 format data.table
 \description{
 Formats a pmr0 formatted dataset into mc0 format for
 tcpl analysis. Requires the creation of endpoints via
-DNT.60.Analysis::create_endp().
+gabi::create_endp().
 }

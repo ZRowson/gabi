@@ -32,22 +32,25 @@
 #' @import data.table
 calc_lamhat <- function (data) {
                   # Isolate vehicle control animals
-                    table <- data[wllt == "v"]
+                    table <- data.table::copy(data)
                   # Create linear model and estimate optimal lambda
+                    # Find shift parameter
                     if (any(table[,rval] < 0, na.rm = TRUE)) {
                       shift <- min(table[, rval], na.rm = TRUE) %>%
                                 floor() * (-1)
                     }  else if (any(table[,rval] == 0, na.rm = TRUE)) {
                       shift <- 1
                     } else shift <- 0
-
-                    lklhd <- MASS::boxcox(rval+shift ~ egid, data = table,
+                    # Find maximum likelihood Box-Cox power parameter for vc groups
+                    tester <- table[wllt == "v"]
+                    lklhd <- MASS::boxcox(rval+shift ~ egid, data = tester,
                                          lambda = seq(-3, 3, by = 0.25),
                                          plotit = FALSE
                             )
                     lam.hat <- lklhd$x[which.max(lklhd$y)]
 
                   return(list(lam.hat = lam.hat,
-                              shift = shift)
+                              shift = shift
+                              )
                          )
                 }

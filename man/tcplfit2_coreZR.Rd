@@ -94,6 +94,6 @@ Zachary Rowson \email{Rowson.Zachary@epa.gov}
 
 Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
 remove default plotting method provided by tcplfit2. Replaces plotting method
-with declaration of a logical to be passed to DNT.60.Analysis::concRespCoreZR
-wrapper function to determine if DNT.60.Analysis::tcplggplotter should be run.
+with declaration of a logical to be passed to gabi::concRespCoreZR
+wrapper function to determine if gabi::tcplggplotter should be run.
 }

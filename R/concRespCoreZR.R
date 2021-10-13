@@ -21,7 +21,7 @@
 #' @param aicc aicc = T uses corrected AIC to choose winning method; otherwise
 #'   regular AIC.
 #' @param force.fit If TRUE force the fitting to proceed even if there are no points
-#'   outside of the bounds (default FALSE)
+#'   outside of the bounds (default TRUE) Note Default of TRUE was changed in ZR edit to avoid error in gabi::tcplfit2_coreZR
 #' @param bidirectional If TRUE allow fitting to happen in both directions (default TRUE)
 #' @param verbose  If TRUE, write extra output from tcplfit2_core (default FALSE)
 #' @param do.plot If TRUE, create a plot in the tcplfit2_core function (default FALSE)
@@ -56,7 +56,7 @@ concRespCoreZR <- function(row,
                          ),
                          conthits = TRUE,
                          aicc = FALSE,
-                         force.fit = FALSE,
+                         force.fit = TRUE,
                          bidirectional = TRUE,
                          verbose = FALSE,
                          do.plot = FALSE,
@@ -74,25 +74,25 @@ concRespCoreZR <- function(row,
   conc <- unlist(conc)
 
   # prepare input
-  resp <- resp - bmed
   conc <- conc[!is.na(resp)]
   resp <- resp[!is.na(resp)]
   bresp <- bresp[!is.na(bresp)]
   logc <- log10(conc)
-  rmds <- tapply(resp, logc, stats::median)
-  identifiers <- row[!names(row) %in% c("conc", "resp", "bmed", "onesd", "cutoff", "bresp")]
+  rmds <- tapply(resp, logc, mean)
+  identifiers <- row[!names(row) %in% c("conc", "resp", "bmed", "onesd", "cutoff.int", "bresp")]
 
   # run the fits
-  params <- DNT.60.Analysis::tcplfit2_coreZR(conc, resp, bresp, rmds, cutoff,
-                          force.fit = conthits, bidirectional = bidirectional, fitmodels = fitmodels,
-                          verbose = verbose, do.plot = do.plot
-  )
+  params <- gabi::tcplfit2_coreZR(conc, resp, bresp, rmds, cutoff,
+                                             force.fit = conthits, bidirectional = bidirectional,
+                                             fitmodels = fitmodels, verbose = verbose,
+                                             do.plot = do.plot
+                                            )
 
   # calculate the hitcall
-  summary <- tcplfit2::tcplhit2_core(params, conc, resp, cutoff, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
+  summary <- gabi::tcplhit2_coreZR(params, conc, resp, cutoff.int, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
   # Create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
-    plot <- DNT.60.Analysis::tcplggplotter(resp, bresp, logc, rmds, bmed, params, summary)
+    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, method, params, summary)
   }
   if (return.details) {
     return(list(summary = summary, all.models = params, plot = plot))

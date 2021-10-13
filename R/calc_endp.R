@@ -1,18 +1,17 @@
-#' Calculate endpoint from pmr0 formatted table
-#'
-#' Calculates endpoint from pmr0 time-series response
-#' data.Endpoints are used as measure of response for
-#' tcpl analysis. calc_endp is a wrapper function for
-#' various other funcitons of calc_ family. Endpoint
-#' values fill rval column in mc0 table format after
-#' conversion with DNT.60.Analysis::as_mc02.
+#' Calculate endpoint values from pmr0 formatted table
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
-#' @details Details on how endpoints are calculated can be found
-#' by searching for appropriate calc_ funciton (?calc_).
+#' @description
+#' Calculates endpoint values for tcpl analysis from pmr0
+#' formatted table. Function is a wrapper function for
+#' endpoint calculating functions in calc_ family. Endpoint
+#' values fill rval column in mc0 table after
+#' conversion with gabi::as_mc0.
 #'
-#' Last edit 06/07/21.
+#' @details Details on what endpoints represent can be found
+#' by searching for appropriate calc_ function (?gabi::calc_...).
+#' Last edit 09/28/21.
 #'
 #' @param data is a pmr0 formatted data.table
 #'   \itemize{
@@ -35,71 +34,47 @@
 #'   \itemize{
 #'     \item AUC_L - area under curve in light
 #'     \item AUC_D - area under curve in dark
+#'     \item AUC_T - area under curve over whole time-series
+#'     \item AUC_r - ratio of AUC_D/AUC_L
 #'     \item avgS_L - average speed in light
 #'     \item avgS_D - average speed in dark
+#'     \item avgS_T - average speed over whole time series
 #'     \item avgA_L - average acceleration in light
 #'     \item avgA_D - average acceleration in dark
-#'     \item strtl - startle acceleration during transition from light to dark
+#'     \item avgJ_L - average jerk in light
+#'     \item avgJ_D - average jerk in dark
+#'     \item strtlA - acceleration during startle, light-dark, transition
+#'     \item strtlAavg - difference between apeed in last period of dark and avgS_L
+#'     \item strtlF - startle factor, ratio of speed in first period of dark over speed in last period of light
+#'     \item frzA - acceleration during freeze, dark-light, transition
+#'     \item frzF - freeze factor, ratio of speed in first period of light over speed in last period of acclimation
 #'   }
 #'
-#' @return A vector with endpoint measurements
+#' @param no.A number of measurements made in acclimation period
+#' @param no.L number of measurements made in light period
+#' @param no.D number of measurements made in dark period
 #'
-#' @import data.table
-calc_endp <- function (data, no.A = 10, no.L = 20, no.D = 20, rval = NULL) { # Goal of no.A etc is to generalize this function so user can specify the experimental methods
-                if (!(rval %in% c("AUC_L", "AUC_D", "avgS_L", "avgS_D",
-                                "avgA_L", "avgA_D", "strtlA", "strtlF"))) {
-                  stop("argument rval either needs to be specified or is not in set \n
-                        c(AUC_L, AUC_D, avgS_L, avgS_D, avgA_L, avgA_D, strtlA, strtlF)")
+#' @return A vector with user specified endpoint values
+calc_endp <- function (data, no.A = 10, no.L = 20, no.D = 20, rval = NULL) {
+                if (is.null(rval) || !(rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r", "avgS_L", "avgS_D",
+                                                   "avgS_T", "avgA_L", "avgA_D", "avgJ_L", "avgJ_D","strtlA",
+                                                   "strtlAavg", "strtlF", "frzA","frzF", "hbt_L", "hbt_D"))) {
+                  stop("rval improperly specified")
                 }
-                table <- data.table::copy(data)
-                # Determine desired endpoint based on rval argument
-                  if (rval %in% c("AUC_L", "AUC_D")) {
-                      endp <- DNT.60.Analysis::calc_AUC(table)[[rval]]
-                  } else if (rval %in% c("avgS_L", "avgS_D")) {
-                      endp <- DNT.60.Analysis::calc_avgS(table)[[rval]]
-                  } else if (rval %in% c("avgA_L", "avgA_D")) {
-                      endp <- DNT.60.Analysis::calc_avgA(table)[[rval]]
-                  } else if (rval %in% c("strtlA", "strtlF")) {
-                      endp <- DNT.60.Analysis::calc_strtl(table)[[rval]]
+
+                # make call to appropriate calc_ function based on rval argument
+                  if (rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r")) {
+                      endp <- gabi::calc_AUC(data, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("avgS_L", "avgS_D", "avgS_T")) {
+                      endp <- gabi::calc_avgS(data, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("avgA_L", "avgA_D", "avgJ_L", "avgJ_D")) {
+                      endp <- gabi::calc_avgAJ(data, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("frzA","frzF","strtlA", "strtlAavg", "strtlF")) {
+                      endp <- gabi::calc_trans(data, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("hbt_L", "hbt_D")) {
+                    endp <- gabi::calc_hbt(data, no.A, no.L, no.D)[[rval]]
                   }
+
 
                 return(endp)
              }
-
-                # #--------------------
-                # # Aggregate Movement
-                # #--------------------
-                # # Create matrix of endpoint titles and their corresponding interval
-                #   title <- c("SUM_L", "SUM_D", "SUM_T", "AUC_L", "AUC_D", "AUC_T")
-                #   light <-
-                #     interval <- rep(list(names(table[,vt11:vt30]), names(table[,vt30:vt50]), names(table[,vt11:vt50])), 2)
-                #   endpoints <- as.matrix(cbind(title, interval))
-
-                # # return(endpoints)
-                # # Create SUM endpoints
-                #   apply(endpoints, 1,
-                #         function(endp) table[, endp$`title`:=rowSums(.SD), .SDcols=endp$`interval`]
-                #         ) %>%
-                #     invisible()
-                #
-                # # Create AUC endpoints
-                #  apply(endpoints[4:6,], 1, function(endp) {
-                #                               table[, endp$`title`:=
-                #                                 (rowSums(.SD[, endp$`interval`[3:length(endp$`interval`)-1], with=FALSE])+
-                #                                 (0.5*rowSums(.SD[, endp$`interval`[c(1,length(endp$`interval`))], with=FALSE]))),
-                #                                 .SDcols=endp$interval]
-                #                             }
-                #        ) %>%
-                #    invisible()
-
-                #------------------------------
-                # Immediate change in activity
-                #------------------------------
-
-                # Can do this a couple ways, simply calculate the difference between the two values or you could see how much
-                # the value changes relative to the amount fish were already moving
-
-#                 table <- table[, -(vt1:vt50)]
-#
-#                 return(table)
-# }

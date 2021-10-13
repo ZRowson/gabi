@@ -4,7 +4,7 @@
 \alias{as_mc0}
 \title{This function reformats behavioral data as mc0. Much of this function copies code from
 Katie Paul-Friedmans "PADILLA_ZF_BEHAVIOR_s_to_tcpl(editted).R"
-Future updates to DNT.60.Analysis will likey not require use
+Future updates to gabi will likey not require use
 of this function.}
 \usage{
 as_mc0(chemnames, endp)
@@ -17,6 +17,6 @@ as_mc0(chemnames, endp)
 \description{
 This function reformats behavioral data as mc0. Much of this function copies code from
 Katie Paul-Friedmans "PADILLA_ZF_BEHAVIOR_s_to_tcpl(editted).R"
-Future updates to DNT.60.Analysis will likey not require use
+Future updates to gabi will likey not require use
 of this function.
 }

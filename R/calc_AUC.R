@@ -1,14 +1,14 @@
 #' Calculate AUC in light and dark for individual fish
 #'
-#' Calculates area under curve per light level (dark or light) for
-#' individual fish. Uses trapezoidal rule to approximate integral of
-#' speed funciton per fish. User provides a pmr0 table and inputs
-#' number of time periods for each experimental stage:
-#' acclimation, light, and dark.
-#'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
-#' @details Last edit 06/07/21.
+#' @description
+#' Calculates area under curve for a chosen light level (light or dark).
+#' Uses trapezoidal rule to approximate integral of speed function.
+#' User provides a pmr0 table and specifies number of time periods per
+#' experimental stage: acclimation, light, and dark.
+#'
+#' @details Last edit 09/27/21.
 #'
 #' @param data is a pmr0 formatted data.table
 #'   \itemize{
@@ -23,30 +23,34 @@
 #'     \item conc - concentration of chemical
 #'     \item tj - measurements at time period j for j /in {1,2,3,...,n}
 #'   }
-#' @param length.A number of measurements made in acclimation period
-#' @param length.L number of measurements made in light period
-#' @param length.D number of measurements made in dark period
+#' @param no.A number of measurements made in acclimation period
+#' @param no.L number of measurements made in light period
+#' @param no.D number of measurements made in dark period
 #'
 #' @return A list with AUC in each light level for each fish
 #'   \itemize{
 #'     \item AUC_L - AUC in light
 #'     \item AUC_D - AUC in dark
-#'   }
-#'
-#'   @import data.table
-calc_AUC <- function(data, length.A = 10, length.L = 20, length.D = 20) {
-              table <- data.table::copy(data)
-              tprds <- grep("vt", names(table), value = TRUE)
-              sets <- list(AUC_L = tprds[(length.A+1):(length.A+length.L)],
-                           AUC_D = tprds[(length.A+length.L+1):(length.A+length.L+length.D)]
-                          )
-              # Create AUC endpoints
-                AUC <- lapply(sets, function(set) {
-                                        table[, rowSums(.SD[, set[2:(length(set)-1)], with=FALSE]) +
-                                                (0.5*rowSums(.SD[, ..set[c(1,length(set))], with=FALSE]))
-                                             ]
-                                     }
-                             )
+#'     \item AUC_r - AUC_D / AUC_L
+#'  }
+calc_AUC <- function(data, no.A = 10, no.L = 20, no.D = 20) {
+
+                trapezoidal <- function(x, data) {
+                  xy <- data[x]
+                  fl <- x[c(1, length(x))] # first and last values in x
+                  rowSums(xy[!(x%in%fl)]) + (rowSums(xy[fl])/2)}
+
+                rownames(data) <- NULL
+              # separate time periods based on associated experimental period
+                t <- grep("vt", names(data), value = TRUE)
+                sets <- list(AUC_L = t[(no.A+1):(no.A+no.L)],
+                             AUC_D = t[(no.A+no.L+1):(no.A+no.L+no.D)],
+                             AUC_T = t[(no.A+1):(no.A+no.L+no.D)]
+                            )
+              # calculate AUC endpoints
+                temp <- data[t]
+                AUC <- lapply(sets, trapezoidal, data = data)
+                AUC[["AUC_r"]] <- AUC[["AUC_D"]] / (AUC[["AUC_L"]] + 1)
 
               return(AUC)
             }
