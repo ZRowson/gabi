@@ -11,7 +11,7 @@
 #'
 #' @details
 #' Created: 10/06/2021
-#' Last edit: 10/06/2021
+#' Last edit: 10/26/2021
 #'
 #' Subject Specific (SS) perspective fits curves to each individual's speed data
 #' and plots. Population Averaged (PA) perspective fits to the mean speed at each
@@ -57,7 +57,7 @@
 #'
 #' @import ggplot2
 #' @import data.table
-plot_tseries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Minutes", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
+plot_tSeries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Minutes", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
 
                   # extract data relating to user specified chemical
 
@@ -94,38 +94,42 @@ plot_tseries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Min
                     label.conc <- paste0(val.conc, unit.conc)
                     names(label.conc) <- val.conc
 
+                    ## set color scheme
+                    x <- to.fit_long[,apid]; y <- to.fit_long[,rowi]; z <- to.fit_long[,coli]
+                    n <- length(interaction(x,y,z))
+                    colors <- viridis::viridis(n)
+
                     ## plot
                     plot <- ggplot(data = to.fit_long, aes(color = interaction(apid,rowi,coli))) +
                               geom_point(aes(x = t, y = val)) +
                               geom_line(aes(x = t, y = val, group = interaction(apid,rowi,coli))) +
                               facet_wrap(~ conc, labeller = labeller(conc=label.conc)) +
                               theme(legend.position = "none") +
-                              labs(title=paste0("SS Time-Series for ",chemical), subtitle="Acclimation Period Excluded",
-                                   x=label.t, y=label.mov) +
-                              scale_x_discrete(breaks = as.character(seq(from=no.A,to=n,by=5)))
+                              labs(title=paste0("SS Time-Series for ",chemical),
+                                   subtitle="Acclimation Period Excluded",
+                                   x=label.t,
+                                   y=label.mov) +
+                              scale_x_discrete(breaks = as.character(seq(from=no.A,to=n,by=5))) +
+                              scale_color_manual(values = colors)
                   } else if (prsp == "PA") {
 
                     # format data for plotting
 
                     ## calculate mean movement at each time period by concentration group
-                    means <- to.fit[, lapply(.SD, function(col) mean(col, na.rm=T)),
-                                    .SDcols = grep("vt", names(to.fit), value = T),
-                                    by = conc]
+                    t <- grep("vt", names(to.fit), value = TRUE)
+                    means <- to.fit[, lapply(.SD, function(col) mean(col,na.rm=T)),
+                                    .SDcols = t, by = conc]
+                    SEs <- to.fit[, lapply(.SD, function(col) stats::sd(col,na.rm=T)/sqrt(length(col))),
+                                  .SDcols = t, by = conc]
 
-                    ## elongate means data
+                    ## elongate means and SEs data, and join
                     means_long <- data.table::melt(means, id.vars = "conc", variable.name = "t", value.name = "mean")
                     means_long[, t := sub("vt","",t)]
+                    SEs_long <- data.table::melt(SEs, id.vars = "conc", variable.name = "t", value.name = "SE")
+                    SEs_long[, t := sub("vt","",t)]
+                    stats <- means_long[SEs_long, on = c("conc","t")][, conc := as.factor(conc)]
 
-                    ## find Q2 and Q3 for data by concentration at each time period
-                    l <- length(unique(to.fit[, conc]))
-                    Q2Q3 <- to.fit[, lapply(.SD, function(col) summary(col)[c(2,5)]),
-                                   .SDcols = grep("vt", names(to.fit), value = T),
-                                   by = conc][, Q := rep(c("Q2", "Q3"),l)]
-
-                    ## format Q2Q3 data by elongating and then widening
-                    Q2Q3_long <- data.table::melt(Q2Q3, id.vars = c("conc","Q"), measure.vars = grep("vt",names(to.fit),value=T), variable.name = "t")
-                    Q2Q3_wide <- data.table::dcast(Q2Q3_long, conc + t ~ Q, value.var = "value")
-                    Q2Q3_wide[, t := gsub("vt", "", t)]
+                    # create standard error of mean estimates by time period and plot as ribbons or error bars
 
                     # plot time-series data
 
@@ -136,18 +140,49 @@ plot_tseries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Min
                     label.legend <- paste0("Concentration (", unit.conc, ")")
 
                     ## create x-axis breaks
-                    n <- as.integer(max(to.fit_long[,t]))
+                    n <- as.integer(max(means_long[,t]))
                     breaks.t <- as.character(seq(from=no.A,to=n,by=5))
+
+                    ## get better colors for plotting
+                    n <- length(unique(to.fit[,conc]))
+                    colors <- viridis::viridis(n)
 
                     ## plot
                     plot <- ggplot() +
-                              geom_point(data = means_long, aes(x=t, y=mean, color=as.factor(conc))) +
-                              geom_line(data = means_long, aes(x=t, y=mean, color=as.factor(conc), group=conc)) +
-                              geom_errorbar(data = Q2Q3_wide, aes(x=t, ymin=Q2, ymax=Q3), width = 0.95) +
+                              geom_point(data = stats, aes(x=t, y=mean, color=as.factor(conc))) +
+                              geom_line(data = stats, aes(x=t, y=mean, color=conc, group=conc)) +
+                                scale_color_manual(values = colors) +
+                              geom_ribbon(data = stats, aes(x=t, ymax=mean+SE, ymin=mean-SE,
+                                                            group=conc, fill=conc),
+                                          alpha = 0.25) +
+                                scale_fill_manual(values = colors) +
                               labs(title = title, subtitle = "Acclimation Period Excluded",
                                    x = label.t, y = label.mean, color = label.legend) +
+                              guides(fill = "none") +
                               scale_x_discrete(breaks = breaks.t)
                   }
 
                   return(plot)
                 }
+
+# ## find Q2 and Q3 for data by concentration at each time period
+# l <- length(unique(to.fit[, conc]))
+# Q2Q3 <- to.fit[, lapply(.SD, function(col) summary(col)[c(2,5)]),
+#                .SDcols = grep("vt", names(to.fit), value = T),
+#                by = conc][, Q := rep(c("Q2", "Q3"),l)]
+#
+# ## format Q2Q3 data by elongating and then widening
+# Q2Q3_long <- data.table::melt(Q2Q3, id.vars = c("conc","Q"), measure.vars = grep("vt",names(to.fit),value=T), variable.name = "t")
+# Q2Q3_wide <- data.table::dcast(Q2Q3_long, conc + t ~ Q, value.var = "value")
+# Q2Q3_wide[, t := gsub("vt", "", t)]
+
+## t-distribution confidence intervals fitted to log10 data and then transformed back for fitting
+# t <- grep("vt", names(to.fit), value = T)
+# logCIs <- to.fit[, lapply(.SD, function(x) log10(x+1)), .SDcols = t, by = conc][, lapply(.SD, function(x) t.test(x,conf.int=0.95)$conf.int), .SDcols = t, by = conc]
+# CIs <- logCIs[, lapply(.SD, function(x) (10^x)-1), by = conc]
+
+## add variable indicating if value is upper of lower bound of interval. Melt and dcast data for fitting
+# CIs[, pos := rep_len(c("min","max"),nrow(CIs))]
+# temp <- data.table::melt(CIs, id.vars = c("conc","pos"), variable.name = "t", value.name = "y")
+# temp[, t := gsub("vt","",t)]
+# CIs.long <- dcast(temp, conc + t ~ pos, value.var = "y")

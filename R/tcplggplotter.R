@@ -31,7 +31,6 @@
 #' @param logc Log base 10 of vector of concentrations from tcpl row object
 #' @param rmds Response medians of each test-concentration group
 #' @param bmed Response median of baseline
-#' @param method Method used to calculate cutoff
 #' @param params List of model-fit paramaeters returned from tcplfit2::tcplfit2_core.
 #' List of N(models) elements, one for each of the models run (up to 10),
 #' followed by a last element "modelnames", which is a  vector of model names so
@@ -54,6 +53,7 @@
 #'     \item sds - the names of the standard deviations of the paramters
 #'   }
 #' @param summary list of tcplfit2 analysis output returned from tcplfit2::tcplhit2_core
+#' @param unit.conc - unit of chemical concentration. Defaults to $\mu$M
 #'
 #' @return A ggplot2 object of tcplfit2 analysis displaying...
 #'   \itemize {
@@ -66,62 +66,117 @@
 #'     }
 #'
 #' @import data.table
-tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, method, params, summary) {
+tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, params, summary, unit.conc = paste0("\U03BC","M")) {
+
+                    # plot concentration response curves and other statistics related to model of chemical activity
+
+                    # consolidate x & y coordinates for resp and bresp
+
+                    ## create data.table for responses and a sudo concentration as x coordinate for bresp
+                    conc.sudo <- min(conc) / 10
+                    logc <- log10(c(conc[order(conc)], rep(conc.sudo, length(bresp))))
+                    resp.xy <- data.table(wllt = c(rep("t", length(resp)), rep("v", length(bresp))),
+                                          logc = logc,
+                                          resp = c(resp[order(conc)], bresp))
+
+                    # create x and y coordinates for plotting curve fits
+
+                    ## import curve fits
                     list2env(params, env = environment())
 
-                    shortnames <- modelnames[modelnames != "cnst"]
-                    logc <- logc[order(logc)]
-                    # Consolidate x & y coordinates for resp and models
-                      resp.pnts <- data.table::data.table(logc = logc, resp = resp[order(conc)])
-                      x <- seq(from = min(conc)/10, to = max(conc), by = 0.01)
-                      curve.pnts <- data.table::data.table(logc = log10(x),
-                                                           sapply(shortnames, function(fit) {
-                                                                                func <- get(fit)[["func"]]
-                                                                                func(x)}))
-                      # "melt" to long format for easy grouping
-                      resp.pnts.lng <- data.table::melt(resp.pnts, id.vars = c("logc"), measure.vars = c("resp"))
-                      curve.pnts.lng <- data.table::melt(curve.pnts, id.vars = c("logc"), measure.vars = as.character(shortnames))
-                      # Consolidate control response in df format for use with ggplot2
-                      bresp.pnts <- data.table::data.table(logc = min(logc)-1, value = bresp)
-                    # Consolidate descriptive and inferential statistics
-                      df.rmds <- data.frame(logc = c(as.numeric(row.names(rmds)), min(logc)-1), rmds = c(as.numeric(rmds), mean(bresp.pnts[, value]))) # maybe possible to avoid declaring another df, try using ggplot2::stat_summary()
-                      raw <- list(resp.pnts.lng[variable=="resp"], bresp.pnts)
-                      # CIs <- lapply(raw, function (table){
-                      #                       CIs <- table[, gabi::calc_qCI(value, conf.level=0.90), by = logc]
-                      #                       CIs[, .(lower=interval[2], upper=interval[1]), by = logc]
-                      #                     }
-                      #               )
-                      # CIs <- data.table::rbindlist(CIs)
-                      for.ci <- c(resp[order(conc)], bresp)
-                      D.test <- DescTools::DunnettTest(x = for.ci, g = c(conc[(order(conc))], rep(0,length(bresp)))) # Dunnett's many-to-one test
-                      CIs <- as.data.frame(cbind(logc = unique(logc), D.test[["0"]][, c("lwr.ci","upr.ci")])) # Dunnett's CI's
+                    ## use curve functions to find f(x)
+                    x <- seq(from = min(conc)/10, to = max(conc), by = 0.01)
+                    shortnames <- modelnames[modelnames != "cnst"] # this may throw an error if some functions were not fit
+                    curve.xy <- data.table(logc = log10(x),
+                                           sapply(shortnames, function(fit) {
+                                                               func <- get(fit)[["func"]]
+                                                               func(x)}))
 
-                    list2env(summary, env = environment())
-                    # Create plot
-                      plot <- ggplot2::ggplot() +
-                                ggplot2::geom_point(data = resp.pnts.lng, mapping = ggplot2::aes(x=logc, y=value)) + # Points for all models and response
-                                ggplot2::geom_point(data = bresp.pnts, mapping = ggplot2::aes(x=logc, y=value), shape = 1) + # Response for control
-                                ggplot2::geom_point(data = df.rmds, ggplot2::aes(x=logc, y=rmds), shape = 7, size = 4) + # Response medians
-                                ggplot2::geom_errorbar(data = CIs, ggplot2::aes(x=logc, ymin=lwr.ci, ymax=upr.ci), width = 0.095) + # CI's for response medians
-                                ggplot2::geom_line(data = curve.pnts.lng, ggplot2::aes(x=logc, y=value, colour=variable)) + # Plot model fits
-                                ggplot2::geom_hline(yintercept = c(-bmr, bmr), linetype = "dotted") +
-                                # ggplot2::geom_hline(yintercept = -bmr, linetype = c) +
-                                ggplot2::scale_color_manual(values = c("black", "cyan", "dark magenta", "red", "darkgoldenrod1",
-                                                                       "hotpink", "chartreuse", "darkred", "blue1")) +
-                                ggplot2::annotate("rect", xmin = -Inf, xmax = Inf, ymin = -cutoff, ymax= cutoff, alpha = .2) + # Add cutoff range
-                                ggplot2::labs(title = paste("ConcResp of", name, "for", assay),
-                                              subtitle = paste0("hitcall = ", round(summary$hitcall,3)),
-                                              colour = "Models",
-                                              y = "resp",
-                                              caption = paste0("Best Fit=", fit_method,
-                                                              ", RMSE=", round(summary$rmse,6),
-                                                              ", caikwt=", round(summary$caikwt,6),
-                                                              ", cutoff=", round(cutoff,6),
-                                                              ", top=", round(summary$top,6),
-                                                              ", AC50=", round(summary$ac50,6),
-                                                              ", BMR=", round(summary$bmr,6),
-                                                              ", BMD.set=", paste0("{",round(summary$bmdl,6),", ",round(summary$bmd,6),", ",round(summary$bmdu,6),"}")
-                                                        )
-                                )
+                    ## "melt" curve coordinates to long format for plotting and grouping
+                    curve.xy.lng <- data.table::melt(curve.xy, id.vars = "logc", measure.vars = as.character(shortnames))
+
+                    # gather descriptive and inferential statistics for plotting
+
+                    ## construct Dunnett's CI's
+
+                    ## run test and create a data.frame to hold confidence intervals
+                    D.test <- DescTools::DunnettTest(x = resp.xy[,resp], g = logc) # Dunnett's many-to-one test
+                    CIs <- as.data.frame(D.test[[1]][, c("lwr.ci","upr.ci")])
+                    logc.CI <- unique(log10(conc[order(conc)]))
+                    row.names(CIs) <- logc.CI
+
+                    ## gather other inferential and descriptive statistics from summary of tcplfit2 run
+                    list2env(summary, env = environment()) # might not be necessary to call this into the environment
+
+                    ## round summary statistics for captions
+                    stats <- c("hitcall", "rmse", "caikwt", "top", "ac50", "bmr", "bmdl", "bmd", "bmdu")
+                    cap <- round(summary[stats], 3)
+
+                    ## create plot
+                    plot <- ggplot() +
+                      geom_jitter(resp.xy, mapping = aes(x=logc, y=resp, shape=wllt), width = 0.05) +
+                        stat_summary(resp.xy, mapping = aes(x=logc, y=resp, size=4, shape="mean"),fun = "mean", geom = "point") +
+                        scale_shape_manual(values = c(8, 16, 1), labels = c("Mean","Test","Vehicle Control")) +
+                        geom_errorbar(CIs, mapping = aes(x=as.numeric(row.names(CIs)), ymin=lwr.ci, ymax=upr.ci), width = 0.095) +
+                      geom_line(curve.xy.lng, mapping = aes(x=logc, y=value, colour=variable)) +
+                        scale_color_manual(values = viridis::turbo(9)) +
+                      geom_hline(aes(yintercept = c(-bmr, bmr), linetype = "BMR")) +
+                        scale_linetype_manual(values = c("dotted")) +
+                      geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -cutoff, ymax= cutoff, fill = "Cutoff Range"), alpha = .2) +
+                      guides(size = "none",
+                             color = guide_legend(order=4),
+                             linetype = guide_legend(order=2),
+                             fill = guide_legend(order=3),
+                             shape = guide_legend(order=1)) +
+                      labs(title = paste("Concentration Response of", name, "for", assay),
+                           colour = "Models",
+                           linetype = "",
+                           fill = "",
+                           shape = "",
+                           x = bquote("log"[10]~.(unit.conc)),
+                           y = expression(paste("Response - ", bar("Vehicle Control Response"))),
+                           caption = paste0("hitcall=", cap["hitcall"],
+                                            ", Best Fit=", fit_method,
+                                            ", RMSE=", cap["rmse"],
+                                            ", caikwt=", cap["caikwt"],
+                                            ", cutoff=", round(cutoff,3),
+                                            ", top=", cap["top"],
+                                            ", AC50=", cap["ac50"],
+                                            ", BMR=", cap["bmr"],
+                                            ", BMD.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}")
+                           )
+                      )
+
+                      # plot <- ggplot() +
+                      #           geom_point(resp.xy, mapping = aes(x=logc, y=resp, shape=wllt)) +
+                      #             stat_summary(resp.xy, mapping = aes(x=logc, y=resp, shape="mean"), fun = "mean", geom = "point") +
+                      #             scale_shape_manual(values = c(7, 16, 1)) +
+                      #             geom_errorbar(CIs, mapping = aes(x=as.numeric(row.names(CIs)), ymin=lwr.ci, ymax=upr.ci), width = 0.095) +
+                      #           geom_line(curve.xy.lng, mapping = aes(x=logc, y=value, colour=variable)) +
+                      #             scale_color_manual(values = viridis::turbo(9)) +
+                      #           geom_hline(aes(yintercept = c(-bmr, bmr), linetype = "BMR")) +
+                      #             scale_linetype_manual(values = c("dotted")) +
+                      #           geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = -cutoff, ymax= cutoff, fill = "Cutoff Range"), colour = "darkgrey", alpha = .2) + # Add cutoff range
+                      #           labs(title = paste("Concentration Response of", name, "for", assay),
+                      #                shape = "",
+                      #                colour = "Models",
+                      #                linetype = "",
+                      #                fill = "",
+                      #                x = bquote("log"[10]~.(unit.conc)),
+                      #                y = expression(paste("Response - ", bar("Vehicle Control Response"))),
+                      #                caption = paste0("hitcall=", cap["hitcall"],
+                      #                                 ", Best Fit=", fit_method,
+                      #                                 ", RMSE=", cap["rmse"],
+                      #                                 ", caikwt=", cap["caikwt"],
+                      #                                 ", cutoff=", round(cutoff,3),
+                      #                                 ", top=", cap["top"],
+                      #                                 ", AC50=", cap["ac50"],
+                      #                                 ", BMR=", cap["bmr"],
+                      #                                 ", BMD.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}")
+                      #                          )
+                      #           )
                     return(plot)
-                  }
+}
+
+# c("black", "cyan", "dark magenta", "red", "darkgoldenrod1",
+#   "hotpink", "chartreuse", "darkred", "blue1")) +

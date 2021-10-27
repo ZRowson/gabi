@@ -9,7 +9,7 @@
 #'
 #' @details
 #' Created: 10/12/2021
-#' Last edit: 10/12/2021
+#' Last edit: 10/26/2021
 #'
 #' Scatter-plots are provided rather than box-plots or violin-plots to provide
 #' as much transparency as possible as to how data appear. This action is in
@@ -42,29 +42,40 @@
 #'
 #' @import ggplot2
 #' @import data.table
-plot_acdist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"),plot.log = TRUE) {
+plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log = TRUE) {
 
-                # isolate data of interest and plot
+                # isolate data of interest for plotting
 
                 ## find egid related to chemical to gather test fish and vehicle control
-  data <- data_egids(mc0[[1]])
-  group <- unique(data[cpid == chemical, egid])
-  to.fit <- data[cpid==chemical | (wllt=="v"&egid==group)]
-  conc <- unique(to.fit[wllt == "t", conc])
-  new.conc <- min(conc) / 10
-  to.fit[wllt == "v", conc := new.conc]
+                data <- data_egids(mc0)
+                group <- unique(data[cpid == chemical, egid])
+                to.fit <- data[cpid==chemical | (wllt=="v" & egid==group)]
 
-  ## plot jitter-plots by concentration of test chemical
-  ggplot(data = to.fit, aes(x = log10(conc), y = rval)) +
-    geom_violin(aes(fill = as.factor(conc))) +
-    stat_summary(fun=median, geom="point", shape=23, size=4) +
-    geom_boxplot(aes(group = conc)) +
-    geom_dotplot(binaxis = 'y', stackdir = 'center', position = position_dodge(1),
-                 aes(group = conc), binwidth = 0.1)
+                ## save concentration as a factor for plotting
+                to.fit[, conc := as.factor(conc)]
 
-  data <- data_egids(mc0_n[[1]][[1]])
-  group <- unique(data[cpid == chemical, egid])
-  to.fit <- data[cpid==chemical | (wllt=="v"&egid==group)]
+                # create plot labels and set color scheme
 
+                ## isolate endpoint name
+                acid <- unique(mc0[,acid])
+                endp <- gsub("_ZFpmrALD-20-40-40", "", acid)
 
+                ## save labels as objects
+                title <- paste0(chemical, " Exposure: ", "Boxplots of ", endp, " Values")
+                label.resp <- "Response Value"
+                label.conc <- paste0("Concentration (", unit.conc, ")")
+
+                ## set color scheme
+                n <- length(unique(to.fit[,conc]))
+                colors <- viridis::viridis(n)
+
+                ## plot jitter-plots by concentration of test chemical
+                ggplot(data = to.fit, aes(x=conc, y=rval)) +
+                  geom_jitter(aes(group=conc), width = 0.1) +
+                  geom_boxplot(aes(fill=conc), outlier.alpha = 0, alpha = 0.25) +
+                    scale_fill_manual(values = colors) +
+                  guides(fill = "none") +
+                  labs(title = title,
+                       x = label.conc,
+                       y = label.resp)
 }
