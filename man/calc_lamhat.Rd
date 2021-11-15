@@ -30,9 +30,12 @@ formatted as below.
   }}
 }
 \value{
-MLE for lambda of Box-Cox transform.
+\itemize {
+          \item lam.hat - MLE for lambda of Box-Cox transform.
+          \item shift - shift to avoid rvals less than or equal to zero.
+        }
 }
 \description{
-Calcualtes lambda.hat for data by finding optimal lambda
-fro vehicle control. I need to elaborate on this further.
+Calculates parameters for Box-Cox power transformation from data. Uses
+MLE estimation based on residuals of linear model (rval + shift ~ egid).
 }

@@ -9,7 +9,7 @@
 #'
 #' @details
 #' Created: 10/12/2021
-#' Last edit: 10/26/2021
+#' Last edit: 11/15/2021
 #'
 #' Scatter-plots are provided rather than box-plots or violin-plots to provide
 #' as much transparency as possible as to how data appear. This action is in
@@ -37,12 +37,14 @@
 #' @param unit.conc - unit of chemical concentration. Defaults to $\mu$M
 #' @param plot.log - boolean indicator of whether or not concentrations should be plotted on a
 #' logarithmic, base 10, scale. Defaults to TRUE
+#' @param lam.hat - power parameter used in Box-Cox transformation of the data
+#' @param shift - shift parameter used in Box-Cox transformation
 #'
 #' @return A ggplot2 object displaying scatterplots of endpoint values grouped by concentration
 #'
 #' @import ggplot2
 #' @import data.table
-plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log = TRUE) {
+plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log = TRUE, lam.hat = "NA", shift = "NA") {
 
                 # isolate data of interest for plotting
 
@@ -77,5 +79,8 @@ plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log
                   guides(fill = "none") +
                   labs(title = title,
                        x = label.conc,
-                       y = label.resp)
+                       y = label.resp,
+                       caption = paste0("Box-Cox Parameters: ","\U03BB","=",lam.hat," Shift=",shift)) +
+                  theme_bw() +
+                  theme(axis.text = element_text(size=10))
 }

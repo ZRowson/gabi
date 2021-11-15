@@ -4,7 +4,19 @@
 \alias{tcplggplotter}
 \title{Plot tcplfit2 output with ggplot2}
 \usage{
-tcplggplotter(resp, bresp, logc, rmds, bmed, params, summary)
+tcplggplotter(
+  resp,
+  bresp,
+  conc,
+  logc,
+  rmds,
+  bmed,
+  lam.hat,
+  shift,
+  params,
+  summary,
+  unit.conc = paste0("μ", "M")
+)
 }
 \arguments{
 \item{resp}{Vector of test-group response extracted from tcpl row object}
@@ -17,7 +29,11 @@ tcplggplotter(resp, bresp, logc, rmds, bmed, params, summary)
 
 \item{bmed}{Response median of baseline}
 
-\item{params}{List of model-fit paramaeters returned from tcplfit2::tcplfit2_core.
+\item{lam.hat}{Numeric power used to Box-Cox transform data}
+
+\item{shift}{Numeric value used to shift data values from zero for transformation}
+
+\item{params}{List of model-fit parameters returned from tcplfit2::tcplfit2_core.
 List of N(models) elements, one for each of the models run (up to 10),
 followed by a last element "modelnames", which is a  vector of model names so
 other functions can easily cycle through the output. For a full list, see the
@@ -40,6 +56,8 @@ is a sublist with elements including:
   }}
 
 \item{summary}{list of tcplfit2 analysis output returned from tcplfit2::tcplhit2_core}
+
+\item{unit.conc}{- unit of chemical concentration. Defaults to $\mu$M}
 }
 \value{
 A ggplot2 object of tcplfit2 analysis displaying...
@@ -56,7 +74,7 @@ A ggplot2 object of tcplfit2 analysis displaying...
 Plot tcplfit2 output with ggplot2
 }
 \details{
-Last edit: 06/03/2021
+Last edit: 11/02/2021
 Roxygen created this manual page on `r Sys.Date()` using R version
 `r getRversion()`.
 Used in conjunction with concRespCoreZR() and tcplfit2_coreZR().
@@ -64,7 +82,7 @@ Not meant to be used as a stand alone function. Graphics are meant to replicate
 appearance of default graphics produced in tcplfit2::tcplfit2_core.
 }
 \author{
-Zachary Rowson \email{Rowson.Zachary@epa.gov)}
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 
 Plots concentration response trend of multiple-concentration experiment
 on a chemical. tcplfit2 functions are used to produce interpolating

@@ -8,7 +8,7 @@
 #' data and descriptive statistics necessary for tcpl
 #' analysis.
 #'
-#' @param table is a mc0 dataset formatted as below
+#' @param data is a mc0 dataset formatted as below
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
@@ -24,6 +24,10 @@
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoints resp values of each fish
 #'   }
+#' @param chemical is a string representing chemical of interest
+#' @param lam.hat is power used to Box-Cox transform data
+#' @param shift is value used to shift data values from zero for transformation
+#'
 #' @return A tcpl row object
 #'   \itemize{
 #'       \item conc - vector of concentrations at which each fish was tested
@@ -38,7 +42,7 @@
 #'   }
 #'
 #'   @import data.table
-as_row2 <- function(data, chemical, method = "MAD") {
+as_row2 <- function(data, chemical, lam.hat = 1, shift = 0) {
             table <- gabi::data_egids(data)
 
             # Consolidate necessary data
@@ -70,6 +74,8 @@ as_row2 <- function(data, chemical, method = "MAD") {
                           onesd = onesd,
                           cutoff.int = c(-cutoff, cutoff),
                           name = chemical,
-                          assay = assay)
+                          assay = assay,
+                          lam.hat = lam.hat,
+                          shift = shift)
             return(row)
           }

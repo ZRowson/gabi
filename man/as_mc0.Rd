@@ -2,21 +2,57 @@
 % Please edit documentation in R/as_mc0.R
 \name{as_mc0}
 \alias{as_mc0}
-\title{This function reformats behavioral data as mc0. Much of this function copies code from
-Katie Paul-Friedmans "PADILLA_ZF_BEHAVIOR_s_to_tcpl(editted).R"
-Future updates to gabi will likey not require use
-of this function.}
+\title{Format pmr0 data set as mc0 for tcpl analysis}
 \usage{
-as_mc0(chemnames, endp)
+as_mc0(data, rval = NULL)
 }
 \arguments{
-\item{chemnames}{vector of chemical names as strings}
+\item{rval}{is the name of desired endpoint as a string}
 
-\item{endp}{string name of endpoint to saved as rval}
+\item{table}{is a pmr0 dataset formatted as below
+\itemize{
+  \item srcf - name of file that is being formatted
+  \item acid - assay component id (Here ZFpmrALD-20-40-40)
+    Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+  \item cpid - chemical name
+  \item apid - assay plate id DNT###
+  \item rowi - row on plate
+  \item coli - column on plate
+  \item wllt - well type according to tcpl mc0 format
+   t = test, v = vehicle control
+  \item wllq - well quality indicates if observation is viable for analysis
+    1 = yes, 0 = no
+  \item conc - concentration of chemical
+  \item vtj - measurements at time period j for j /in {1,2,...,n}
+    Here n = 50
+}}
+}
+\value{
+A mc0 format data.table
+  \itemize{
+    \item srcf - name of file that is being formatted
+    \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
+      Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+    \item cpid - chemical name
+    \item apid - assay plate id DNT###
+    \item rowi - row on plate
+    \item coli - column on plate
+    \item wllt - well type according to tcpl mc0 format
+     t = test, v = vehicle control
+    \item wllq - well quality indicates if observation is viable for analysis
+      1 = yes, 0 = no
+    \item conc - concentration of chemical
+    \item rval - endpoints resp values of each fish
+  }
 }
 \description{
-This function reformats behavioral data as mc0. Much of this function copies code from
-Katie Paul-Friedmans "PADILLA_ZF_BEHAVIOR_s_to_tcpl(editted).R"
-Future updates to gabi will likey not require use
-of this function.
+Formats a pmr0 formatted dataset into mc0 format for
+tcpl analysis. Requires the creation of endpoints via
+gabi::create_endp().
+}
+\details{
+Last Edit: 09/28/2021
+}
+\author{
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 }

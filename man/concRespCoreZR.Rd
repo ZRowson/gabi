@@ -10,7 +10,7 @@ concRespCoreZR(
     "exp4", "exp5"),
   conthits = TRUE,
   aicc = FALSE,
-  force.fit = FALSE,
+  force.fit = TRUE,
   bidirectional = TRUE,
   verbose = FALSE,
   do.plot = FALSE,
@@ -41,7 +41,7 @@ discrete.}
 regular AIC.}
 
 \item{force.fit}{If TRUE force the fitting to proceed even if there are no points
-outside of the bounds (default FALSE)}
+outside of the bounds (default TRUE) Note Default of TRUE was changed in ZR edit to avoid error in gabi::tcplfit2_coreZR}
 
 \item{bidirectional}{If TRUE allow fitting to happen in both directions (default TRUE)}
 

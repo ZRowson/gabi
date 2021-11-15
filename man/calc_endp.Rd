@@ -2,12 +2,9 @@
 % Please edit documentation in R/calc_endp.R
 \name{calc_endp}
 \alias{calc_endp}
-\title{Create endpoints from pmr0 formatted table
-  Zachary Rowson
-  Rowson.Zachary at epa.gov
-  Last edit: 04/06/2021}
+\title{Calculate endpoint values from pmr0 formatted table}
 \usage{
-calc_endp(data, no.A = 10, no.L = 20, no.D = 20)
+calc_endp(data, no.A = 10, no.L = 20, no.D = 20, rval = NULL)
 }
 \arguments{
 \item{data}{is a pmr0 formatted data.table
@@ -29,17 +26,42 @@ calc_endp(data, no.A = 10, no.L = 20, no.D = 20)
 \item{no.L}{number of measurements made in light period}
 
 \item{no.D}{number of measurements made in dark period}
+
+\item{rval}{- string representing endpoint of interest. Can equal...
+\itemize{
+  \item AUC_L - area under curve in light
+  \item AUC_D - area under curve in dark
+  \item AUC_T - area under curve over whole time-series
+  \item AUC_r - ratio of AUC_D/AUC_L
+  \item avgS_L - average speed in light
+  \item avgS_D - average speed in dark
+  \item avgS_T - average speed over whole time series
+  \item avgA_L - average acceleration in light
+  \item avgA_D - average acceleration in dark
+  \item avgJ_L - average jerk in light
+  \item avgJ_D - average jerk in dark
+  \item strtlA - acceleration during startle, light-dark, transition
+  \item strtlAavg - difference between apeed in last period of dark and avgS_L
+  \item strtlF - startle factor, ratio of speed in first period of dark over speed in last period of light
+  \item frzA - acceleration during freeze, dark-light, transition
+  \item frzF - freeze factor, ratio of speed in first period of light over speed in last period of acclimation
+}}
 }
 \value{
-A table with endpoint measurements
-  \itemize{
-    \item ...first columns same as pmr0 format minus tj data
-    \item
-  }
-  @import data.table
+A vector with user specified endpoint values
 }
 \description{
-Returns complete USA EPA ORD CCTE BCTD RADB Padilla lab DNT60 data
-set in pmr0 format. pmr0 format is easily transformed
-into mc0 with gabi::as_mc0() for tcpl analysis.
+Calculates endpoint values for tcpl analysis from pmr0
+formatted table. Function is a wrapper function for
+endpoint calculating functions in calc_ family. Endpoint
+values fill rval column in mc0 table after
+conversion with gabi::as_mc0.
+}
+\details{
+Details on what endpoints represent can be found
+by searching for appropriate calc_ function (?gabi::calc_...).
+Last edit 09/28/21.
+}
+\author{
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 }

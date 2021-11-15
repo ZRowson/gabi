@@ -5,16 +5,16 @@
 #' @description
 #' Plots total movement per 2-minute bin time-series data of a test chemical and
 #' it's corresponding vehicle control using either a Subject-Specific (SS)
-#' perspective or a Population Averaged (PA) perspective. User provides pmr0
+#' perspective or a Sample Averaged (SA) perspective. User provides pmr0
 #' formatted table, a character object specifying chemical to be plotted, and a
-#' character object "SS" or "PA" specifying graphical method.
+#' string object "SS" or "SA" specifying graphical method.
 #'
 #' @details
 #' Created: 10/06/2021
-#' Last edit: 10/26/2021
+#' Last edit: 11/15/2021
 #'
 #' Subject Specific (SS) perspective fits curves to each individual's speed data
-#' and plots. Population Averaged (PA) perspective fits to the mean speed at each
+#' and plots. Population Averaged (SA) perspective fits to the mean speed at each
 #' time period for a concentration group.
 #'
 #' @param pmr0 - is a pmr0 dataset formatted as below
@@ -36,28 +36,29 @@
 #'   }
 #'
 #' @param chemical - string corresponding to name of chemical of interest
-#' @param prsp - specifies SS or PA perspective, can take value "SS" or "PA"
+#' @param prsp - specifies SS or SA perspective, can take value "SS" or "SA"
 #' @param no.A - number of time periods in acclimation period
 #' @param unit.t - length of time contained in each time period. Defaults to "2 Minutes"
-#' @param unit.mov - unit of distance traveled by subjects. Defaults to cm
+#' @param unit.mov - unit of distance traveled by subjects. Defaults to cm / 2 min
 #' @param unit.conc - unit of chemical concentration. Defaults to $\mu$M
 #'
 #' @return A ggplot2 object displaying total movement time-series data from one of two perspectives
 #'   SS
 #'   \itemize {
 #'     \item time series by individual
-#'     \item individuals are colored according to their plate #, row #, and col # s.t. name = plate #|row #|col #
+#'     \item time series of concentration-group means for each time period
 #'     \item time series faceted by chemical concentration grouping
 #'   }
 #'   PA
 #'   \itemize {
 #'     \item time series of concentration-group means for each time period
-#'     \item curves for each concentration are plotted together and are colored to distinguish them
+#'     \item curves for each concentration are plotted together and are colored
+#'     \item colored ribbons representing 50% confidence intervals about time period means
 #'   }
 #'
 #' @import ggplot2
 #' @import data.table
-plot_tSeries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Minutes", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
+plot_tSeries <- function(pmr0, chemical, prsp = "SA", no.A = 10, unit.t = "min", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
 
                   # extract data relating to user specified chemical
 
@@ -89,77 +90,88 @@ plot_tSeries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Min
 
                     ## add units to plot labels
                     label.t <- paste0("Time (", unit.t, ")")
-                    label.mov <- paste0("Total Movement (", unit.mov, ")")
+                    label.mov <- paste0("Total Movement (", unit.mov, "/", unit.t, ")")
                     val.conc <- unique(to.fit[,conc])
                     label.conc <- paste0(val.conc, unit.conc)
                     names(label.conc) <- val.conc
 
                     ## set color scheme
-                    x <- to.fit_long[,apid]; y <- to.fit_long[,rowi]; z <- to.fit_long[,coli]
-                    n <- length(interaction(x,y,z))
+                    n <- length(unique(to.fit[,conc]))
                     colors <- viridis::viridis(n)
 
+                    # set x-axis breaks and labels
+                    m <- max(to.fit_long[,t])
+                    breaks <- as.character(seq(from=no.A,to=m,by=5))
+                    labels <- as.character(2 * seq(from=no.A,to=m,by=5))
+
                     ## plot
-                    plot <- ggplot(data = to.fit_long, aes(color = interaction(apid,rowi,coli))) +
-                              geom_point(aes(x = t, y = val)) +
-                              geom_line(aes(x = t, y = val, group = interaction(apid,rowi,coli))) +
+                    plot <- ggplot(data = to.fit_long) +
+                              geom_point(aes(x = t, y = val), alpha = 0.4, color = "grey48") +
+                              geom_line(aes(x = t, y = val, group = interaction(apid,rowi,coli)), alpha = 0.4, color = "grey48") +
+                                stat_summary(aes(x = t, y = val, color = as.factor(conc), group = as.character(conc)), geom = "line", fun = "mean", size = 1.25) +
+                                scale_color_manual(values = colors) +
                               facet_wrap(~ conc, labeller = labeller(conc=label.conc)) +
-                              theme(legend.position = "none") +
+                              theme_bw() +
+                              theme(legend.position = "none",
+                                    axis.text = element_text(size=10),
+                                    plot.margin = unit(c(5.5,8.5,5.5,5.5),"points")) +
                               labs(title=paste0("SS Time-Series for ",chemical),
                                    subtitle="Acclimation Period Excluded",
                                    x=label.t,
                                    y=label.mov) +
-                              scale_x_discrete(breaks = as.character(seq(from=no.A,to=n,by=5))) +
-                              scale_color_manual(values = colors)
-                  } else if (prsp == "PA") {
+                              scale_x_discrete(breaks = breaks, labels = labels)
+                  } else if (prsp == "SA") {
 
                     # format data for plotting
 
-                    ## calculate mean movement at each time period by concentration group
+                    ## calculate mean movement at each time period and 50% CIs by concentration group
                     t <- grep("vt", names(to.fit), value = TRUE)
                     means <- to.fit[, lapply(.SD, function(col) mean(col,na.rm=T)),
                                     .SDcols = t, by = conc]
-                    SEs <- to.fit[, lapply(.SD, function(col) stats::sd(col,na.rm=T)/sqrt(length(col))),
-                                  .SDcols = t, by = conc]
+                    logCIs <- to.fit[, lapply(.SD, function(x) log10(x+1)), .SDcols=t, by=conc][, lapply(.SD, function(x) t.test(x,conf.level=0.50)$conf.int), .SDcols=t, by=conc]
+                    CIs <- logCIs[, lapply(.SD, function(x) (10^x)-1), by=conc][,lapply(.SD, function(col) abs(diff(col))/2), .SDcols=t, by=conc]
 
-                    ## elongate means and SEs data, and join
+                    ## elongate means and CIs data, and join
                     means_long <- data.table::melt(means, id.vars = "conc", variable.name = "t", value.name = "mean")
                     means_long[, t := sub("vt","",t)]
-                    SEs_long <- data.table::melt(SEs, id.vars = "conc", variable.name = "t", value.name = "SE")
-                    SEs_long[, t := sub("vt","",t)]
-                    stats <- means_long[SEs_long, on = c("conc","t")][, conc := as.factor(conc)]
+                    CIs_long <- data.table::melt(CIs, id.vars = "conc", variable.name = "t", value.name = "CI")
+                    CIs_long[, t := sub("vt","",t)]
+                    stats <- means_long[CIs_long, on = c("conc","t")][, conc := as.factor(conc)]
 
                     # create standard error of mean estimates by time period and plot as ribbons or error bars
 
                     # plot time-series data
 
-                    ## create title, x- and y-axis labels, and legend label
+                    ## create title, x- and y-axis titles, and legend title
                     title <- paste0("PA Time-Series for ",chemical)
-                    label.t <- paste0("Time (",unit.t,")")
-                    label.mean <- paste0("Mean Speed (",unit.mov,")")
-                    label.legend <- paste0("Concentration (", unit.conc, ")")
-
-                    ## create x-axis breaks
-                    n <- as.integer(max(means_long[,t]))
-                    breaks.t <- as.character(seq(from=no.A,to=n,by=5))
+                    title.t <- paste0("Time (",unit.t,")")
+                    title.mean <- paste0("Mean Speed (",unit.mov,"/",unit.t,")")
+                    title.legend <- paste0("Concentration (", unit.conc, ")")
 
                     ## get better colors for plotting
                     n <- length(unique(to.fit[,conc]))
                     colors <- viridis::viridis(n)
+
+                    ## create x-axis breaks and labels
+                    m <- as.integer(max(means_long[,t]))
+                    breaks <- as.character(seq(from=no.A,to=m,by=5))
+                    labels <- as.character(2 * seq(from=no.A,to=m,by=5))
 
                     ## plot
                     plot <- ggplot() +
                               geom_point(data = stats, aes(x=t, y=mean, color=as.factor(conc))) +
                               geom_line(data = stats, aes(x=t, y=mean, color=conc, group=conc)) +
                                 scale_color_manual(values = colors) +
-                              geom_ribbon(data = stats, aes(x=t, ymax=mean+SE, ymin=mean-SE,
-                                                            group=conc, fill=conc),
+                              geom_ribbon(data = stats,
+                                          aes(x=t, ymax=mean+CI, ymin=mean-CI, group=conc, fill=conc),
                                           alpha = 0.25) +
                                 scale_fill_manual(values = colors) +
-                              labs(title = title, subtitle = "Acclimation Period Excluded",
-                                   x = label.t, y = label.mean, color = label.legend) +
+                              labs(title = title, subtitle = "Acclimation Period Excluded: 50% Confidence Bands",
+                                   x = title.t, y = title.mean, color = title.legend) +
                               guides(fill = "none") +
-                              scale_x_discrete(breaks = breaks.t)
+                              scale_x_discrete(breaks = breaks, labels = labels) +
+                              theme_bw() +
+                              theme(axis.text = element_text(size = 10))
                   }
 
                   return(plot)
@@ -178,7 +190,7 @@ plot_tSeries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Min
 
 ## t-distribution confidence intervals fitted to log10 data and then transformed back for fitting
 # t <- grep("vt", names(to.fit), value = T)
-# logCIs <- to.fit[, lapply(.SD, function(x) log10(x+1)), .SDcols = t, by = conc][, lapply(.SD, function(x) t.test(x,conf.int=0.95)$conf.int), .SDcols = t, by = conc]
+# logCIs <- to.fit[, lapply(.SD, function(x) log10(x+1)), .SDcols = t, by = conc][, lapply(.SD, function(x) t.test(x,conf.int=0.50)$conf.int), .SDcols = t, by = conc]
 # CIs <- logCIs[, lapply(.SD, function(x) (10^x)-1), by = conc]
 
 ## add variable indicating if value is upper of lower bound of interval. Melt and dcast data for fitting
@@ -186,3 +198,11 @@ plot_tSeries <- function(pmr0, chemical, prsp = "PA", no.A = 10, unit.t = "2 Min
 # temp <- data.table::melt(CIs, id.vars = c("conc","pos"), variable.name = "t", value.name = "y")
 # temp[, t := gsub("vt","",t)]
 # CIs.long <- dcast(temp, conc + t ~ pos, value.var = "y")
+
+
+
+# SEs <- to.fit[, lapply(.SD, function(col) stats::sd(col,na.rm=T)/sqrt(length(col))),
+#               .SDcols = t, by = conc]
+# SEs_long <- data.table::melt(SEs, id.vars = "conc", variable.name = "t", value.name = "SE")
+# SEs_long[, t := sub("vt","",t)]
+# stats <- means_long[SEs_long, on = c("conc","t")][, conc := as.factor(conc)]

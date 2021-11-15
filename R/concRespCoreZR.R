@@ -92,7 +92,7 @@ concRespCoreZR <- function(row,
   summary <- gabi::tcplhit2_coreZR(params, conc, resp, cutoff.int, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
   # Create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
-    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, params, summary)
+    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary)
   }
   if (return.details) {
     return(list(summary = summary, all.models = params, plot = plot))
