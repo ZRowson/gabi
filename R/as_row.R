@@ -1,7 +1,8 @@
 #' Format chemical data into tcpl row object for tcpl analysis
 #'   Zachary Rowson
 #'   Rowson.Zachary at epa.gov
-#'   Last edit: 08/27/2021
+#'   Created 06/01/2021
+#'   Last edit: 12/09/2021
 #'
 #' Formats a chemical data from a mc0 dataset into a row
 #' object for tcpl analysis. Row objects are lists of
@@ -12,7 +13,7 @@
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'       Zebrafish photomotor response, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -20,7 +21,7 @@
 #'     \item wllt - well type according to tcpl mc0 format
 #'      t = test, v = vehicle control
 #'     \item wllq - well quality indicates if observation is viable for analysis
-#'       1 = yes, 0 = no
+#'       1 = yes, 0 = noS
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoints resp values of each fish
 #'   }
@@ -34,15 +35,15 @@
 #'       \item resp - response of each fish ordered to align with conc vector
 #'       \item bresp - baseline response: vector of baseline fish response values
 #'       \item bmed - median of baseline response
-#'       \item cutoff - numerical value of cutoff representing baseline noise.
-#'         Calculated as 2*MAD(bresp)
-#'       \item onesd - standard deviaiton of bresp
+#'       \item cutoff - numerical value representing noise about baseline
+#'       \item onesd - standard deviation of bresp
 #'       \item name - name of tested chemical
-#'      \item assay - name of assay and endpoint
+#'       \item assay - name of assay and endpoint
 #'   }
 #'
 #'   @import data.table
-as_row2 <- function(data, chemical, lam.hat = 1, shift = 0) {
+#' @export
+as_row <- function(data, chemical, lam.hat = 1, shift = 0) {
             table <- gabi::data_egids(data)
 
             # Consolidate necessary data
@@ -72,7 +73,7 @@ as_row2 <- function(data, chemical, lam.hat = 1, shift = 0) {
                           bresp = bresp,
                           bmed = bmed,
                           onesd = onesd,
-                          cutoff.int = c(-cutoff, cutoff),
+                          cutoff = cutoff,
                           name = chemical,
                           assay = assay,
                           lam.hat = lam.hat,

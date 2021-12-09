@@ -7,7 +7,6 @@
 tcplfit2_coreZR(
   conc,
   resp,
-  bresp,
   rmds,
   cutoff,
   force.fit = FALSE,
@@ -23,8 +22,6 @@ tcplfit2_coreZR(
 \item{conc}{Vector of concentrations (NOT in log units).}
 
 \item{resp}{Vector of responses.}
-
-\item{bresp}{Vector of baseline responses.}
 
 \item{cutoff}{Desired cutoff. If no absolute responses > cutoff and
 force.fit = F, will only fit constant model.}
@@ -42,9 +39,9 @@ return a skeleton output filled with NAs.}
 
 \item{...}{Other fitting parameters (deprecated).}
 
-\item{name}{String of chemical name.}
+\item{name}{String of chemical name. #EDIT}
 
-\item{assay}{String of assay name.}
+\item{assay}{String of assay name. #EDIT}
 }
 \value{
 can.plot - logical indicating if plotting is possible
@@ -64,22 +61,14 @@ is a sublist with elements including:
     \item ga - the AC50 or Hill paramters
     \item er - the error term
     \item ... other paramters specific to the model (see the documentation for the specific models)
-    \item tp_sd, ga_sd, p_sd, etc., the values of the standard deviations of the paramters for the models
+    \item tp_sd, ga_sd, p_sd, etc., the values of the standard deviations of the parameters for the models
     \item er_sd - standard deviation of the error term
     \item pars - the names of the parameters
-    \item sds - the names of the standard deviations of the paramters
+    \item sds - the names of the standard deviations of the parameters
   }
 }
 \description{
 Concentration-response curve fitting EDIT by Zachary Rowson
-}
-\details{
-Last edit: 06/02/2021
-Roxygen created this manual page on `r Sys.Date()` using R version
-`r getRversion()`.
-All models are equal to 0 at 0 concentration (zero background).
-To add more models in the future, write a fit____ function, and add the model
-name to the fitmodels and modelnames vectors.
 }
 \examples{
 conc <- c(.03, .1, .3, 1, 3, 10, 30, 100)
@@ -91,9 +80,16 @@ output <- tcplfit2_core(conc, resp, .8,
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}
+Last Edit: 12/09/2021
+
 
 Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
 remove default plotting method provided by tcplfit2. Replaces plotting method
 with declaration of a logical to be passed to gabi::concRespCoreZR
 wrapper function to determine if gabi::tcplggplotter should be run.
+
+EDIT Tracking
+Edits
+1) add name, and assay to parameters
+2) add can.plot to return
 }

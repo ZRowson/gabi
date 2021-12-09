@@ -36,6 +36,7 @@
 #'     \item avgJ_L - average jerk in light
 #'     \item avgJ_D - average jerk in dark
 #'   }
+#' @export
 calc_avgAJ <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
               # iteratively calculate acceleration and jerk values

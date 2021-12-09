@@ -4,10 +4,16 @@
 \alias{as_mc0}
 \title{Format pmr0 data set as mc0 for tcpl analysis}
 \usage{
-as_mc0(data, rval = NULL)
+as_mc0(data, rval = NULL, no.A = 10, no.L = 20, no.D = 20)
 }
 \arguments{
 \item{rval}{is the name of desired endpoint as a string}
+
+\item{no.A}{number of measurements made in acclimation period}
+
+\item{no.L}{number of measurements made in light period}
+
+\item{no.D}{number of measurements made in dark period}
 
 \item{table}{is a pmr0 dataset formatted as below
 \itemize{
@@ -51,7 +57,7 @@ tcpl analysis. Requires the creation of endpoints via
 gabi::create_endp().
 }
 \details{
-Last Edit: 09/28/2021
+Last Edit: 12/03/2021
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

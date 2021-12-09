@@ -69,6 +69,7 @@
 #'
 #' @import data.table
 #' @import ggplot2
+#' @export
 tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, unit.conc = paste0("\U03BC","M")) {
 
                     # plot concentration response curves and other statistics related to model of chemical activity

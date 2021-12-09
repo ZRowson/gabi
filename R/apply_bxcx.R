@@ -26,9 +26,10 @@
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoint of interest
 #'   }
-#' @return mc0 formatted table with Box-Cox tranformed rvals
+#' @return mc0 formatted table with Box-Cox transformed rvals
 #'
-#'   @import data.table
+#' @import data.table
+#' @export
 apply_bxcx <- function(data) {
                 table <- data.table::copy(data)
 

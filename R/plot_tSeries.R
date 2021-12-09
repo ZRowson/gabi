@@ -58,6 +58,7 @@
 #'
 #' @import ggplot2
 #' @import data.table
+#' @export
 plot_tSeries <- function(pmr0, chemical, prsp = "SA", no.A = 10, unit.t = "min", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
 
                   # extract data relating to user specified chemical

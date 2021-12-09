@@ -10,6 +10,7 @@
 #' @param endp string of endpoint name in acronym form
 #'
 #' @return endpoint name in expanded form
+#' @export
 whatis_Endp <- function(endp) {
 
                   # declare expanded endpoint names

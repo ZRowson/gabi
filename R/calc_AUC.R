@@ -33,6 +33,7 @@
 #'     \item AUC_D - AUC in dark
 #'     \item AUC_r - AUC_D / AUC_L
 #'  }
+#' @export
 calc_AUC <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                 trapezoidal <- function(x, data) {

@@ -7,7 +7,7 @@
 #' tcpl analysis. Requires the creation of endpoints via
 #' gabi::create_endp().
 #'
-#' @details Last Edit: 09/28/2021
+#' @details Last Edit: 12/03/2021
 #'
 #' @param table is a pmr0 dataset formatted as below
 #'   \itemize{
@@ -27,6 +27,9 @@
 #'       Here n = 50
 #'   }
 #' @param rval is the name of desired endpoint as a string
+#' @param no.A number of measurements made in acclimation period
+#' @param no.L number of measurements made in light period
+#' @param no.D number of measurements made in dark period
 #'
 #' @return A mc0 format data.table
 #'   \itemize{
@@ -44,17 +47,21 @@
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoints resp values of each fish
 #'   }
+#' @import data.table
+#' @export
 
-as_mc0 <- function(data, rval = NULL) {
-              # Calculate user-specified endpoint
-                endp <- gabi::calc_endp(data, rval = rval)
-                data$rval <- endp
+as_mc0 <- function(data, rval = NULL, no.A = 10, no.L = 20, no.D = 20) {
+              # calculate user-specified endpoint
+                endp <- gabi::calc_endp(data, rval=rval, no.A=no.A, no.L=no.L, no.D=no.D)
+                data[, rval := endp]
 
-              # Change assay component id
-                acid <- unique(data$acid)
+              # change assay component id
+                acid <- unique(data[,acid])
                 newacid <- paste(rval, acid, sep = "_")
-                data$acid <- newacid
+                data[, acid := newacid]
 
-              mc0 <- data[c('srcf', 'acid', 'cpid', 'apid', 'rowi', 'coli', 'wllt', 'wllq', 'conc', 'rval')]
+              # select mc0 columns
+                mc0 <- data[, .(srcf,acid,cpid,apid,rowi,coli,wllt,wllq,conc,rval)]
+
               return(mc0)
 }

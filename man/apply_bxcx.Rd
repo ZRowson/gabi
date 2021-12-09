@@ -28,9 +28,7 @@ apply_bxcx(data)
 }}
 }
 \value{
-mc0 formatted table with Box-Cox tranformed rvals
-
-  @import data.table
+mc0 formatted table with Box-Cox transformed rvals
 }
 \description{
 Applies Box-Cox power transformation to mc0 rval with goal

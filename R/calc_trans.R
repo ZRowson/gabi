@@ -36,6 +36,7 @@
 #'     \item frzA - "freeze acceleration" acceleration at freeze behavior
 #'     \item frzF - "freeze factor" fold change in speed at freeze
 #'   }
+#' @export
 calc_trans <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                 rownames(data) <- NULL

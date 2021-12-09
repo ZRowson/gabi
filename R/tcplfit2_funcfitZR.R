@@ -18,8 +18,6 @@
 #'    Entries in params depend upon the model fit.
 #'
 #' @return func - function form of model params provided
-#'   }
-#' @export
 #'
 #' @examples
 #' conc <- c(.03, .1, .3, 1, 3, 10, 30, 100)
@@ -29,6 +27,7 @@
 #'   do.plot = TRUE
 #' )
 #' @import data.table
+#' @export
 tcplfit2_funcfitZR <- function(model, fit) {
                         list2env(fit, envir = environment())
                         if (model == "hill") {

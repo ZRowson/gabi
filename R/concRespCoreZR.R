@@ -1,7 +1,19 @@
 #' Concentration Response Core - ZR Edits
+#' Last Edit: 12/09/2021
 #'
-#' EDIT by Zachary Rowson (Rowson.Zachary#epa.gov). Changed plotting method.
-#' Core of concentration response curve fitting for pvalue based cutoff. This
+#'
+#' EDIT by Zachary Rowson (Rowson.Zachary#epa.gov).
+#' Edit Tracking:
+#' 1) force.fit = TRUE
+#'   a) default changed from FALSE to avoid error in gabi::tcplfit2_coreZR (line #?)
+#' 2) in documentation, changed recommended structure of row parameter
+#' 3) inclusion of bresp in row and parameters
+#' 4) removed centering of data about bmed as it is done in as_row (is this necessary?)
+#' 5) call to gabi::tcplfit2_coreZR and tcplhit2_coreZR rather than tcplfit2 functions
+#' 6) call to gabi::tcplggplotter and declaration of plot object
+#'
+#'
+#' Core of concentration response curve fittieng for pvalue based cutoff. This
 #' function calls tcplfit2_core to get curve fits, and then tcplhit2_core to
 #' perform the hitcalling.
 #'
@@ -9,19 +21,22 @@
 #'   \itemize{
 #'     \item conc - list of concentrations (not in log units)
 #'     \item resp - list of corresponding responses
+#'     \item bresp - baseline response: vector of baseline fish response values #EDIT
 #'     \item bmed - median of noise estimate.
 #'     \item cutoff - noise cutoff
 #'     \item onesd - 1 standard deviation of the noise (for bmd calculation)
+#'     \item name - name of tested chemical #EDIT
+#'      \item assay - name of assay and endpoint #EDIT
 #'   }
 #'   Other elements (usually identifiers, like casrn) of row will be attached to
 #'   the final output.
 #' @param fitmodels Vector of model names to use.
 #' @param conthits conthits = T uses continuous hitcalls, otherwise they're
 #'   discrete.
-#' @param aicc aicc = T uses corrected AIC to choose winning method; otherwise
+#' @param aicc aicc = TRUE uses corrected AIC to choose winning method; otherwise
 #'   regular AIC.
 #' @param force.fit If TRUE force the fitting to proceed even if there are no points
-#'   outside of the bounds (default TRUE) Note Default of TRUE was changed in ZR edit to avoid error in gabi::tcplfit2_coreZR
+#'   outside of the bounds (default TRUE)
 #' @param bidirectional If TRUE allow fitting to happen in both directions (default TRUE)
 #' @param verbose  If TRUE, write extra output from tcplfit2_core (default FALSE)
 #' @param do.plot If TRUE, create a plot in the tcplfit2_core function (default FALSE)
@@ -56,7 +71,7 @@ concRespCoreZR <- function(row,
                          ),
                          conthits = TRUE,
                          aicc = FALSE,
-                         force.fit = TRUE,
+                         force.fit = TRUE, #EDITED
                          bidirectional = TRUE,
                          verbose = FALSE,
                          do.plot = FALSE,
@@ -67,33 +82,37 @@ concRespCoreZR <- function(row,
   # variable binding to pass cmd checks
   bmed <- cutoff <- onesd <- plot <- NULL
   # row needs to include cutoff and bmed
-  # unpack row into the local environment, for ease: sample_id, dtxsid, casrn, name, time, pathway, size, con, resp
+  # unpack row into the local environment, for ease: sample_id, dtxsid, casrn, name, time, pathway, size, conc, resp
   list2env(row, envir = environment())
   resp <- unlist(resp)
-  bresp <- unlist(bresp)
+  bresp <- unlist(bresp) # EDIT
   conc <- unlist(conc)
 
-  # prepare input
+  # prepare input EDIT: removed centralization about bmed, this is done is as_row
   conc <- conc[!is.na(resp)]
   resp <- resp[!is.na(resp)]
-  bresp <- bresp[!is.na(bresp)]
+  bresp <- bresp[!is.na(bresp)] # EDIT
+  identifiers <- row[!names(row) %in% c("conc", "resp", "bmed", "onesd", "cutoff.int", "bresp")] #EDIT
+
+  # EDIT: calculate response medians in concRespCore to avoid running it in tcplfit2_coreZR and tcplggplotter
   logc <- log10(conc)
   rmds <- tapply(resp, logc, mean)
-  identifiers <- row[!names(row) %in% c("conc", "resp", "bmed", "onesd", "cutoff.int", "bresp")]
 
   # run the fits
-  params <- gabi::tcplfit2_coreZR(conc, resp, bresp, rmds, cutoff,
-                                             force.fit = conthits, bidirectional = bidirectional,
-                                             fitmodels = fitmodels, verbose = verbose,
-                                             do.plot = do.plot
-                                            )
+  params <- gabi::tcplfit2_coreZR(conc, resp, rmds, cutoff,
+                                  force.fit = conthits, bidirectional = bidirectional,
+                                  fitmodels = fitmodels, verbose = verbose,
+                                  do.plot = do.plot
+                                  ) # EDIT
 
   # calculate the hitcall
-  summary <- gabi::tcplhit2_coreZR(params, conc, resp, cutoff.int, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
-  # Create plotting summary if can.plot == TRUE
+  summary <- tcplfit2::tcplhit2_core(params, conc, resp, cutoff, onesd, bmr_scale, bmed, conthits, aicc, identifiers, bmd_low_bnd, bmd_up_bnd)
+
+  # EDIT: create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
     plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary)
   }
+
   if (return.details) {
     return(list(summary = summary, all.models = params, plot = plot))
   } else {

@@ -13,7 +13,7 @@ tcplfit2_funcfitZR(model, fit)
 Entries in params depend upon the model fit.}
 }
 \value{
-
+func - function form of model params provided
 }
 \description{
 Produce curve fit function for tcpl fits

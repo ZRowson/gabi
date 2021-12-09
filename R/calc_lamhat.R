@@ -30,6 +30,7 @@
 #'         }
 #'
 #' @import data.table
+#' @export
 calc_lamhat <- function (data) {
                   # Isolate vehicle control animals
                     table <- data.table::copy(data)

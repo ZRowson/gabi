@@ -1,27 +1,26 @@
 #' Concentration-response curve fitting EDIT by Zachary Rowson
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
+#' Last Edit: 12/09/2021
+#'
 #'
 #' Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
 #' remove default plotting method provided by tcplfit2. Replaces plotting method
 #' with declaration of a logical to be passed to gabi::concRespCoreZR
 #' wrapper function to determine if gabi::tcplggplotter should be run.
 #'
-#' @details
-#' Last edit: 06/02/2021
-#' Roxygen created this manual page on `r Sys.Date()` using R version
-#' `r getRversion()`.
-#' All models are equal to 0 at 0 concentration (zero background).
-#' To add more models in the future, write a fit____ function, and add the model
-#' name to the fitmodels and modelnames vectors.
+#' EDIT Tracking
+#' Edits
+#' 1) add name, and assay to parameters
+#' 2) add can.plot to return
+#'
 #'
 #' @param conc Vector of concentrations (NOT in log units).
 #' @param resp Vector of responses.
-#' @param bresp Vector of baseline responses.
 #' @param cutoff Desired cutoff. If no absolute responses > cutoff and
 #'   force.fit = F, will only fit constant model.
-#' @param name String of chemical name.
-#' @param assay String of assay name.
+#' @param name String of chemical name. #EDIT
+#' @param assay String of assay name. #EDIT
 #' @param force.fit If force.fit = T, will fit all models regardless of cutoff.
 #' @param bidirectional If bidirectional = F, will only give positive fits.
 #' @param verbose If verbose = T, will print optimization details and aics.
@@ -30,7 +29,6 @@
 #'   return a skeleton output filled with NAs.
 #' @param ... Other fitting parameters (deprecated).
 #'
-#' @import graphics
 #'
 #' @return can.plot - logical indicating if plotting is possible
 #' @return List of N(models) elements, one for each of the models run (up to 10),
@@ -48,12 +46,11 @@
 #'     \item ga - the AC50 or Hill paramters
 #'     \item er - the error term
 #'     \item ... other paramters specific to the model (see the documentation for the specific models)
-#'     \item tp_sd, ga_sd, p_sd, etc., the values of the standard deviations of the paramters for the models
+#'     \item tp_sd, ga_sd, p_sd, etc., the values of the standard deviations of the parameters for the models
 #'     \item er_sd - standard deviation of the error term
 #'     \item pars - the names of the parameters
-#'     \item sds - the names of the standard deviations of the paramters
+#'     \item sds - the names of the standard deviations of the parameters
 #'   }
-#' @export
 #'
 #' @examples
 #' conc <- c(.03, .1, .3, 1, 3, 10, 30, 100)
@@ -63,7 +60,8 @@
 #'   do.plot = TRUE
 #' )
 #' @import data.table
-tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, bidirectional = TRUE, verbose = FALSE, do.plot = FALSE,
+#' @export
+tcplfit2_coreZR <- function(conc, resp, rmds, cutoff, force.fit = FALSE, bidirectional = TRUE, verbose = FALSE, do.plot = FALSE,
                           fitmodels = c("cnst", "hill", "gnls", "poly1", "poly2", "pow", "exp2", "exp3", "exp4", "exp5"),
                           ...) {
   fitmodels <- unique(c("cnst", fitmodels)) # cnst models must be present for conthits but not chosen
@@ -81,9 +79,8 @@ tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, 
   for (model in modelnames) {
     # only fit when four or more concentrations, the model is in fitmodels, and
     # ( either one response is above cutoff OR force.fit == T OR it's the constant model.)
-    # to.fit <- (length(rmds) >= 4 && model %in% fitmodels && (length(which(abs(rmds) >= cutoff)) > 0 || force.fit ||
-    #            model == "cnst"))
-    to.fit <- TRUE
+    to.fit <- (length(rmds) >= 4 && model %in% fitmodels && (length(which(abs(rmds) >= cutoff)) > 0 || force.fit ||
+               model == "cnst"))
     fname <- paste0("fit", model) # requires each model function have name "fit____" where ____ is the model name
     # use do.call to call fit function; cnst has different inputs than others.
     assign(model, do.call(fname, list(
@@ -100,12 +97,22 @@ tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, 
         assign(model, append(get(model), list(top = get(model)$tp)))
         assign(model, append(get(model), list(ac50 = get(model)$ga)))
       } else if (model == "gnls") {
+        # gnls methods; use calculated top/ac50, etc.
         assign(model, append(get(model), list(top = acy(0, get(model), type = model, returntop = T))))
-        assign(model, append(get(model), list(ac50 = acy(.5 * get(model)$top, get(model), type = model))))
-        assign(model, append(get(model), list(ac50_loss = acy(.5 * get(model)$top, get(model), type = model, getloss = T))))
+        # check if the theoretical top was calculated
+          if(is.na(get(model)$top)){
+            # if the theoretical top is NA return NA for ac50 and ac50_loss
+            if(verbose){
+              warning("'top' for 'gnls' is not able to be calculated returning NA.  AC50 for gain and loss directions are returned as NA.")
+            }
+            assign(model,append(get(model), list(ac50 = NA_real_,ac50_loss = NA_real_)))
+          } else {
+            assign(model, append(get(model), list(ac50 = acy(.5 * get(model)$top, get(model), type = model))))
+            assign(model, append(get(model), list(ac50_loss = acy(.5 * get(model)$top, get(model), type = model, getloss = T))))
+          }
+        }
       }
-    }
-    assign(model, append(get(model), list(func = gabi::tcplfit2_funcfitZR(model, fit=get(model))))) # Attach function form to model
+    assign(model, append(get(model), list(func = gabi::tcplfit2_funcfitZR(model, fit=get(model))))) # EDIT attach fitted function with parameters to model for future curve plotting
   }
   # optionally print out AICs
   if (verbose) {
@@ -123,6 +130,7 @@ tcplfit2_coreZR <- function(conc, resp, bresp, rmds, cutoff, force.fit = FALSE, 
   successes <- sapply(shortnames, function(x) {
     get(x)[["success"]]
   })
+  # EDIT below: declare can.plot object and append to out object
   if (do.plot && sum(successes, na.rm = T) == length(shortnames)) {
     can.plot <- TRUE
   } else {can.plot <- FALSE}

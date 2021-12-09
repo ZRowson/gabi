@@ -33,6 +33,7 @@
 #'     \item hbt_L - speed ratio in light. max(speed) / min(speed)
 #'     \item hbt_D - speed ratio in dark. max(speed) / min(speed)
 #'   }
+#' @export
 calc_hbt <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                 rownames(data) <- NULL

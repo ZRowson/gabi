@@ -55,24 +55,30 @@
 #' @param no.D number of measurements made in dark period
 #'
 #' @return A vector with user specified endpoint values
+#' @export
 calc_endp <- function (data, no.A = 10, no.L = 20, no.D = 20, rval = NULL) {
+
+
                 if (is.null(rval) || !(rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r", "avgS_L", "avgS_D",
                                                    "avgS_T", "avgA_L", "avgA_D", "avgJ_L", "avgJ_D","strtlA",
                                                    "strtlAavg", "strtlF", "frzA","frzF", "hbt_L", "hbt_D"))) {
                   stop("rval improperly specified")
                 }
 
+                # deal with gosh darn dependency thing
+                  data.df <- as.data.frame(data)
+
                 # make call to appropriate calc_ function based on rval argument
                   if (rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r")) {
-                      endp <- gabi::calc_AUC(data, no.A, no.L, no.D)[[rval]]
+                      endp <- gabi::calc_AUC(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("avgS_L", "avgS_D", "avgS_T")) {
-                      endp <- gabi::calc_avgS(data, no.A, no.L, no.D)[[rval]]
+                      endp <- gabi::calc_avgS(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("avgA_L", "avgA_D", "avgJ_L", "avgJ_D")) {
-                      endp <- gabi::calc_avgAJ(data, no.A, no.L, no.D)[[rval]]
+                      endp <- gabi::calc_avgAJ(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("frzA","frzF","strtlA", "strtlAavg", "strtlF")) {
-                      endp <- gabi::calc_trans(data, no.A, no.L, no.D)[[rval]]
+                      endp <- gabi::calc_trans(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("hbt_L", "hbt_D")) {
-                    endp <- gabi::calc_hbt(data, no.A, no.L, no.D)[[rval]]
+                    endp <- gabi::calc_hbt(data.df, no.A, no.L, no.D)[[rval]]
                   }
 
 

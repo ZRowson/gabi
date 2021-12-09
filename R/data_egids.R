@@ -31,7 +31,8 @@
 #'     \item
 #'   }
 #'
-#'   @import data.table
+#' @import data.table
+#' @export
 data_egids <- function(data) {
                   table <- data.table::copy(data)
                   # Find unique plate ids for each test chemical

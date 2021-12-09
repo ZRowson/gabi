@@ -32,8 +32,6 @@ A data.table of chemical names in each group and corresponding plates.
   \itemize{
     \item
   }
-
-  @import data.table
 }
 \description{
 Takes a mc0 data.table and uses plate numbers to return

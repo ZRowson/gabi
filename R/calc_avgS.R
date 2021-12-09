@@ -32,6 +32,7 @@
 #'     \item avgS_L - average speed in light
 #'     \item avgS_D - average speed in dark
 #'   }
+#' @export
 calc_avgS <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                   rownames(data) <- NULL

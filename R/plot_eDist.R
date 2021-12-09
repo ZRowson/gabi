@@ -44,6 +44,7 @@
 #'
 #' @import ggplot2
 #' @import data.table
+#' @export
 plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log = TRUE, lam.hat = "NA", shift = "NA") {
 
                 # isolate data of interest for plotting
