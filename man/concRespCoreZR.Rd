@@ -2,7 +2,8 @@
 % Please edit documentation in R/concRespCoreZR.R
 \name{concRespCoreZR}
 \alias{concRespCoreZR}
-\title{Concentration Response Core - ZR Edits}
+\title{Concentration Response Core - ZR Edits
+Last Edit: 12/09/2021}
 \usage{
 concRespCoreZR(
   row,
@@ -25,9 +26,12 @@ concRespCoreZR(
 \itemize{
   \item conc - list of concentrations (not in log units)
   \item resp - list of corresponding responses
+  \item bresp - baseline response: vector of baseline fish response values #EDIT
   \item bmed - median of noise estimate.
   \item cutoff - noise cutoff
   \item onesd - 1 standard deviation of the noise (for bmd calculation)
+  \item name - name of tested chemical #EDIT
+   \item assay - name of assay and endpoint #EDIT
 }
 Other elements (usually identifiers, like casrn) of row will be attached to
 the final output.}
@@ -37,11 +41,11 @@ the final output.}
 \item{conthits}{conthits = T uses continuous hitcalls, otherwise they're
 discrete.}
 
-\item{aicc}{aicc = T uses corrected AIC to choose winning method; otherwise
+\item{aicc}{aicc = TRUE uses corrected AIC to choose winning method; otherwise
 regular AIC.}
 
 \item{force.fit}{If TRUE force the fitting to proceed even if there are no points
-outside of the bounds (default TRUE) Note Default of TRUE was changed in ZR edit to avoid error in gabi::tcplfit2_coreZR}
+outside of the bounds (default TRUE)}
 
 \item{bidirectional}{If TRUE allow fitting to happen in both directions (default TRUE)}
 
@@ -65,8 +69,17 @@ output from tcplfit2_core
 a dataframe of one row containing
 }
 \description{
-EDIT by Zachary Rowson (Rowson.Zachary#epa.gov). Changed plotting method.
-Core of concentration response curve fitting for pvalue based cutoff. This
+EDIT by Zachary Rowson (Rowson.Zachary#epa.gov).
+Edit Tracking:
+1) force.fit = TRUE
+  a) default changed from FALSE to avoid error in gabi::tcplfit2_coreZR (line #?)
+2) in documentation, changed recommended structure of row parameter
+3) inclusion of bresp and cutoff as an interval
+4) call to gabi::tcplfit2_coreZR and tcplhit2_coreZR rather than tcplfit2 functions
+5) call to gabi::tcplggplotter and declaration of plot object
+}
+\details{
+Core of concentration response curve fittieng for pvalue based cutoff. This
 function calls tcplfit2_core to get curve fits, and then tcplhit2_core to
 perform the hitcalling.
 }
