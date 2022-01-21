@@ -11,9 +11,11 @@
 #' 4) removed centering of data about bmed as it is done in as_row (is this necessary?)
 #' 5) call to gabi::tcplfit2_coreZR and tcplhit2_coreZR rather than tcplfit2 functions
 #' 6) call to gabi::tcplggplotter and declaration of plot object
+#' 7) add parameter verbose.plot
+#'   a) logical indicator that decides if plot should have caption listing summarizing statistics
 #'
 #'
-#' Core of concentration response curve fittieng for pvalue based cutoff. This
+#' Core of concentration response curve fitting for pvalue based cutoff. This
 #' function calls tcplfit2_core to get curve fits, and then tcplhit2_core to
 #' perform the hitcalling.
 #'
@@ -39,6 +41,7 @@
 #'   outside of the bounds (default TRUE)
 #' @param bidirectional If TRUE allow fitting to happen in both directions (default TRUE)
 #' @param verbose  If TRUE, write extra output from tcplfit2_core (default FALSE)
+#' @param verbose.plot If TRUE, ggplots will have a caption listing summarizing statistics (default TRUE)
 #' @param do.plot If TRUE, create a plot in the tcplfit2_core function (default FALSE)
 #' @param return.details If TRUE, return the hitcalling details and the summary, if FALSE (default), just return the summary
 #' @param bmr_scale - bmr scaling factor (for bmd calculation) default = 1.349
@@ -74,6 +77,7 @@ concRespCoreZR <- function(row,
                          force.fit = TRUE, #EDITED
                          bidirectional = TRUE,
                          verbose = FALSE,
+                         verbose.plot = TRUE,
                          do.plot = FALSE,
                          return.details = FALSE,
                          bmr_scale = 1.349,
@@ -110,7 +114,7 @@ concRespCoreZR <- function(row,
 
   # EDIT: create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
-    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary)
+    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot)
   }
 
   if (return.details) {

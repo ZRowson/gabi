@@ -19,7 +19,7 @@
 #'   }
 #'
 #' @details
-#' Last edit: 11/02/2021
+#' Last edit: 12/13/2021
 #' Roxygen created this manual page on `r Sys.Date()` using R version
 #' `r getRversion()`.
 #' Used in conjunction with concRespCoreZR() and tcplfit2_coreZR().
@@ -55,7 +55,8 @@
 #'     \item sds - the names of the standard deviations of the paramters
 #'   }
 #' @param summary list of tcplfit2 analysis output returned from tcplfit2::tcplhit2_core
-#' @param unit.conc - unit of chemical concentration. Defaults to $\mu$M
+#' @param verbose.plot If TRUE, ggplots will have a caption listing summarizing statistics (default TRUE)
+#' @param unit.conc unit of chemical concentration (default $\mu$M)
 #'
 #' @return A ggplot2 object of tcplfit2 analysis displaying...
 #'   \itemize {
@@ -70,7 +71,7 @@
 #' @import data.table
 #' @import ggplot2
 #' @export
-tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, unit.conc = paste0("\U03BC","M")) {
+tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot, unit.conc = paste0("\U03BC","M")) {
 
                     # plot concentration response curves and other statistics related to model of chemical activity
 
@@ -121,6 +122,19 @@ tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, p
                     cap <- round(as.numeric(summary[stats]), 3)
                     names(cap) <- stats
 
+                    ## create caption
+                    if (verbose.plot) {
+                      caption <- paste0("hitcall=", cap["hitcall"],
+                                        ", Winning Fit=", fit_method,
+                                        ", cutoff=", round(cutoff,3),
+                                        ", top=", cap["top"],
+                                        ", AC50=", cap["ac50"],
+                                        ", BMR=", cap["bmr"],
+                                        ", BMD.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}, "),
+                                        paste0("Box-Cox Parameters: ","\U03BB","=",lam.hat," Shift=",shift)
+                                  )
+                    } else caption <- NULL
+
                     ## create endpoint descriptions
                     endp <- gsub("_ZFpmrALD-20-40-40", "", assay)
                     titles <- gabi::whatis_Endp(endp)
@@ -167,17 +181,7 @@ tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, p
                                    shape = "",
                                    x = unit.conc, # bquote("log"[10]~.(unit.conc)),
                                    y = expression(paste("Response - ", bar("Vehicle Control Response"))),
-                                   caption = paste0("hitcall=", cap["hitcall"],
-                                                    ", Winning Fit=", fit_method,
-                                                    # ", RMSE=", cap["rmse"],
-                                                    # ", caikwt=", cap["caikwt"],
-                                                    ", cutoff=", round(cutoff,3),
-                                                    ", top=", cap["top"],
-                                                    ", AC50=", cap["ac50"],
-                                                    ", BMR=", cap["bmr"],
-                                                    ", BMD.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}, "),
-                                                    paste0("Box-Cox Parameters: ","\U03BB","=",lam.hat," Shift=",shift)
-                                              )) +
+                                   caption = caption) +
                               scale_x_continuous(trans = "log10", breaks = x.breaks, labels = x.labels) +
                               theme_bw()
                     return(plot)

@@ -50,7 +50,11 @@
 #' @import data.table
 #' @export
 
-as_mc0 <- function(data, rval = NULL, no.A = 10, no.L = 20, no.D = 20) {
+as_mc0 <- function(table, rval = NULL, no.A = 10, no.L = 20, no.D = 20) {
+
+              # copy table to prevent writing to original copy
+                data <- data.table::copy(table)
+
               # calculate user-specified endpoint
                 endp <- gabi::calc_endp(data, rval=rval, no.A=no.A, no.L=no.L, no.D=no.D)
                 data[, rval := endp]

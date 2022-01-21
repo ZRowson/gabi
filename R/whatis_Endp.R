@@ -5,7 +5,7 @@
 #' @description
 #' Expands endpoint acronym when given acronym in string form.
 #'
-#' Created 11/02/2021. Last edit 11/02/21.
+#' Created 11/02/2021. Last edit 12/13/21.
 #'
 #' @param endp string of endpoint name in acronym form
 #'
@@ -46,7 +46,7 @@ whatis_Endp <- function(endp) {
                     AUC_T.sub <- "AUC's calculated with trapezoidal rule "
                   avgS_T <- "Average Speed during Total experimental period"
                   AUC_r <- "Area Under Curve Ratio"
-                    AUC_r <- "AUC_r calculated as ratio of AUC_D to AUC_L "
+                    AUC_r.sub <- "AUC_r calculated as ratio of AUC_D to AUC_L "
 
                   # identify name expansion of interest using endp parameter and return
 
