@@ -71,7 +71,7 @@
 #' @import data.table
 #' @import ggplot2
 #' @export
-tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot, unit.conc = paste0("\U03BC","M")) {
+tcplggplotter <- function(endp, resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot, unit.conc = paste0("\U03BC","M")) {
 
                     # plot concentration response curves and other statistics related to model of chemical activity
 
@@ -130,13 +130,12 @@ tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, p
                                         ", top=", cap["top"],
                                         ", AC50=", cap["ac50"],
                                         ", BMR=", cap["bmr"],
-                                        ", BMD.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}, "),
+                                        ", BMC.set=", paste0("{",cap["bmdl"],", ",cap["bmd"],", ",cap["bmdu"],"}, "),
                                         paste0("Box-Cox Parameters: ","\U03BB","=",lam.hat," Shift=",shift)
                                   )
                     } else caption <- NULL
 
                     ## create endpoint descriptions
-                    endp <- gsub("_ZFpmrALD-20-40-40", "", assay)
                     titles <- gabi::whatis_Endp(endp)
                     title <- titles[[1]]
                     if (length(titles) > 1) {
@@ -162,10 +161,10 @@ tcplggplotter <- function(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, p
                               geom_errorbar(CIs, mapping = aes(x=as.numeric(row.names(CIs)), ymin=lwr.ci, ymax=upr.ci), width = 0.095) +
                               geom_line(fit.xy, mapping = aes(x=conc, y=resp.hat, linetype="Winning Fit")) +
                               geom_hline(aes(yintercept = c(bmr.plot), linetype = "BMR")) +
-                              geom_hline(aes(yintercept = 0, linetype = "BMD"), alpha = 0) + # "hacky" way of avoiding "cross" bug in ggplot legend
+                              geom_hline(aes(yintercept = 0, linetype = "BMC"), alpha = 0) + # "hacky" way of avoiding "cross" bug in ggplot legend
                               geom_vline(aes(xintercept = bmd), linetype = "dashed") +
                                 scale_linetype_manual(values = c("dashed","dotted","solid")) +
-                              geom_rect(aes(xmin = bmdl, xmax = bmdu, ymin = -Inf, ymax = Inf, fill = "CI for BMD"), alpha = .2) +
+                              geom_rect(aes(xmin = bmdl, xmax = bmdu, ymin = -Inf, ymax = Inf, fill = "CI for BMC"), alpha = .2) +
                               geom_rect(aes(xmin = 0, xmax = Inf, ymin = -cutoff, ymax= cutoff, fill = "Cutoff Range"), alpha = .2) +
                                 scale_fill_manual(values = c("#00BFC4","red")) +
                               guides(size = "none",

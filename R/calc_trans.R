@@ -40,6 +40,7 @@
 calc_trans <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                 rownames(data) <- NULL
+                avgS_L <- gabi::calc_avgS(data,no.A,no.L,no.D)[["avgS_L"]]
 
                 # gather speed values t boundary periods
                   t <- grep("vt", names(data), value = TRUE)
@@ -50,18 +51,12 @@ calc_trans <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
                 # calculate startle endpoints
                   strtlA <- data[[first.D]] - data[[last.L]]
-                  strtlAavg <- data[[first.D]] - gabi::calc_avgS(data)[["avgS_L"]]
+                  strtlAavg <- data[[first.D]] - avgS_L
                   strtlF <- data[[first.D]] / (data[[last.L]] + 1)
-
-                # Calculate freeze endpoints
-                  frzA <- data[[first.L]] - data[[last.A]]
-                  frzF <- data[[first.L]] / (data[[last.A]] + 1)
 
                 trans <- list(strtlA = strtlA,
                               strtlAavg = strtlAavg,
-                              strtlF = strtlF,
-                              frzA = frzA,
-                              frzF = frzF)
+                              strtlF = strtlF)
 
                 return(trans)
 }

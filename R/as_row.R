@@ -1,8 +1,9 @@
+
 #' Format chemical data into tcpl row object for tcpl analysis
 #'   Zachary Rowson
 #'   Rowson.Zachary at epa.gov
 #'   Created 06/01/2021
-#'   Last edit: 12/09/2021
+#'   Last edit: 02/17/2022
 #'
 #' Formats a chemical data from a mc0 dataset into a row
 #' object for tcpl analysis. Row objects are lists of
@@ -25,9 +26,11 @@
 #'     \item conc - concentration of chemical
 #'     \item rval - endpoints resp values of each fish
 #'   }
-#' @param chemical is a string representing chemical of interest
-#' @param lam.hat is power used to Box-Cox transform data
-#' @param shift is value used to shift data values from zero for transformation
+#'
+#' @param chemical is a string representing chemical of interest.
+#' @param endp is a string representing the endpoint of interest.
+#' @param lam.hat is power used to Box-Cox transform data.
+#' @param shift is value used to shift data values from zero for transformation.
 #'
 #' @return A tcpl row object
 #'   \itemize{
@@ -43,40 +46,43 @@
 #'
 #'   @import data.table
 #' @export
-as_row <- function(data, chemical, lam.hat = 1, shift = 0) {
-            table <- gabi::data_egids(data)
+as_row <- function(data, chemical, endp, lam.hat = 1, shift = 0) {
 
-            # Consolidate necessary data
-              assay <- table[cpid == chemical, acid] %>% unique()
-              group <- table[cpid == chemical & !is.na(rval), egid] %>% unique()
-              concrval <- table[(cpid==chemical|wllt =="v") & egid == group & !is.na(rval), .(conc, rval)]
-              # new.conc <- min(concrval[conc != 0, conc])/1000
-              # concrval[conc == 0, conc := new.conc]
-              brval <- table[wllt == "v" & egid == group & !is.na(rval), rval]
+  # Extract data of interest
+  data.w.egid <- gabi::data_egids(data)
+  group <- data.w.egid[cpid == chemical & !is.na(rval), egid] %>% unique()
+  data.extract <- data.w.egid[(cpid==chemical|wllt =="v") & egid == group & !is.na(rval)]
 
-            # Transform data
-              bmed <- mean(brval)
-              resp <- concrval[conc != 0, rval] - bmed
-              bresp <- brval - bmed
+  # Consolidate necessary descriptive data
+  assay <- data.extract[, unique(acid)]
 
-            # Calculate cutoff
-              bsd <- stats::sd(bresp)
-              bvar <- bsd^2
-              nc <- length(bresp)
-              nt <- min(table(concrval$conc))
-              onesd <- sqrt((bvar/nc) + (bvar/nt))
-              cutoff <- 3*onesd
+  # Shift data so mean rval for control = 0
+  bmed <- data.extract[wllt == "v", mean(rval)]
+  data.extract[, rval := rval - bmed]
 
-            # Generate and assign row vector
-              row <- list(conc = concrval[conc!=0, conc],
-                          resp = resp,
-                          bresp = bresp,
-                          bmed = bmed,
-                          onesd = onesd,
-                          cutoff = cutoff,
-                          name = chemical,
-                          assay = assay,
-                          lam.hat = lam.hat,
-                          shift = shift)
-            return(row)
+  # Gather data for row objects
+  resp <- data.extract[wllt == "t", rval]
+  conc <- data.extract[wllt == "t", conc]
+  bresp <- data.extract[wllt == "v", rval]
+
+
+  # Calculate cutoff as 3 * (standard error of difference)
+  var.0 <- var(bresp)
+  n.0 <- length(bresp)
+  n.i <- data.extract[wllt == "t", .N, by = .(conc)][, mean(N)]
+  onesd <- SE.diff <- sqrt( (var.0/n.0) + (var.0/n.i) )
+  cutoff <- 3*onesd
+
+  # Generate and assign row vector
+  row <- list(conc = conc,
+              resp = resp,
+              bresp = bresp,
+              bmed = bmed,
+              onesd = onesd,
+              cutoff = cutoff,
+              name = chemical,
+              assay = assay,
+              endp = endp,
+              lam.hat = lam.hat,
+              shift = shift)
           }

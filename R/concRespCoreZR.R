@@ -1,5 +1,5 @@
 #' Concentration Response Core - ZR Edits
-#' Last Edit: 12/09/2021
+#' Last Edit: 02/08/2022
 #'
 #'
 #' EDIT by Zachary Rowson (Rowson.Zachary#epa.gov).
@@ -114,7 +114,7 @@ concRespCoreZR <- function(row,
 
   # EDIT: create plotting summary if can.plot == TRUE
   if (params[["can.plot"]]) {
-    plot <- gabi::tcplggplotter(resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot)
+    plot <- gabi::tcplggplotter(endp, resp, bresp, conc, logc, rmds, bmed, lam.hat, shift, params, summary, verbose.plot)
   }
 
   if (return.details) {

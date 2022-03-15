@@ -3,7 +3,7 @@
 \name{concRespCoreZR}
 \alias{concRespCoreZR}
 \title{Concentration Response Core - ZR Edits
-Last Edit: 12/09/2021}
+Last Edit: 02/08/2022}
 \usage{
 concRespCoreZR(
   row,
@@ -14,6 +14,7 @@ concRespCoreZR(
   force.fit = TRUE,
   bidirectional = TRUE,
   verbose = FALSE,
+  verbose.plot = TRUE,
   do.plot = FALSE,
   return.details = FALSE,
   bmr_scale = 1.349,
@@ -51,6 +52,8 @@ outside of the bounds (default TRUE)}
 
 \item{verbose}{If TRUE, write extra output from tcplfit2_core (default FALSE)}
 
+\item{verbose.plot}{If TRUE, ggplots will have a caption listing summarizing statistics (default TRUE)}
+
 \item{do.plot}{If TRUE, create a plot in the tcplfit2_core function (default FALSE)}
 
 \item{return.details}{If TRUE, return the hitcalling details and the summary, if FALSE (default), just return the summary}
@@ -74,12 +77,15 @@ Edit Tracking:
 1) force.fit = TRUE
   a) default changed from FALSE to avoid error in gabi::tcplfit2_coreZR (line #?)
 2) in documentation, changed recommended structure of row parameter
-3) inclusion of bresp and cutoff as an interval
-4) call to gabi::tcplfit2_coreZR and tcplhit2_coreZR rather than tcplfit2 functions
-5) call to gabi::tcplggplotter and declaration of plot object
+3) inclusion of bresp in row and parameters
+4) removed centering of data about bmed as it is done in as_row (is this necessary?)
+5) call to gabi::tcplfit2_coreZR and tcplhit2_coreZR rather than tcplfit2 functions
+6) call to gabi::tcplggplotter and declaration of plot object
+7) add parameter verbose.plot
+  a) logical indicator that decides if plot should have caption listing summarizing statistics
 }
 \details{
-Core of concentration response curve fittieng for pvalue based cutoff. This
+Core of concentration response curve fitting for pvalue based cutoff. This
 function calls tcplfit2_core to get curve fits, and then tcplhit2_core to
 perform the hitcalling.
 }

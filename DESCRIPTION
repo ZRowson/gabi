@@ -31,4 +31,5 @@ Config/testthat/edition: 3
 Depends: 
     R (>= 2.10),
     tcplfit2,
-    ggplot2
+    ggplot2,
+    magrittr

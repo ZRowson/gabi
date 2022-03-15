@@ -7,9 +7,10 @@
 plot_tSeries(
   pmr0,
   chemical,
+  vector,
   prsp = "SA",
   no.A = 10,
-  unit.t = "min",
+  unit.t = "2 min",
   unit.mov = "cm",
   unit.conc = paste0("μ", "M")
 )
@@ -53,7 +54,7 @@ A ggplot2 object displaying total movement time-series data from one of two pers
     \item time series of concentration-group means for each time period
     \item time series faceted by chemical concentration grouping
   }
-  PA
+  SA
   \itemize {
     \item time series of concentration-group means for each time period
     \item curves for each concentration are plotted together and are colored
@@ -69,7 +70,7 @@ string object "SS" or "SA" specifying graphical method.
 }
 \details{
 Created: 10/06/2021
-Last edit: 11/15/2021
+Last edit: 1/21/2022
 
 Subject Specific (SS) perspective fits curves to each individual's speed data
 and plots. Population Averaged (SA) perspective fits to the mean speed at each

@@ -56,7 +56,7 @@
 #'
 #' @return A vector with user specified endpoint values
 #' @export
-calc_endp <- function (data, no.A = 10, no.L = 20, no.D = 20, rval = NULL) {
+calc_endp <- function (data, no.A=10, no.L=20, no.D = 20, rval = NULL) {
 
 
                 if (is.null(rval) || !(rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r", "avgS_L", "avgS_D",

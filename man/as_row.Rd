@@ -6,9 +6,9 @@
   Zachary Rowson
   Rowson.Zachary at epa.gov
   Created 06/01/2021
-  Last edit: 12/09/2021}
+  Last edit: 02/17/2022}
 \usage{
-as_row(data, chemical, lam.hat = 1, shift = 0)
+as_row(data, chemical, endp, lam.hat = 1, shift = 0)
 }
 \arguments{
 \item{data}{is a mc0 dataset formatted as below
@@ -28,11 +28,13 @@ as_row(data, chemical, lam.hat = 1, shift = 0)
   \item rval - endpoints resp values of each fish
 }}
 
-\item{chemical}{is a string representing chemical of interest}
+\item{chemical}{is a string representing chemical of interest.}
 
-\item{lam.hat}{is power used to Box-Cox transform data}
+\item{endp}{is a string representing the endpoint of interest.}
 
-\item{shift}{is value used to shift data values from zero for transformation}
+\item{lam.hat}{is power used to Box-Cox transform data.}
+
+\item{shift}{is value used to shift data values from zero for transformation.}
 }
 \value{
 A tcpl row object

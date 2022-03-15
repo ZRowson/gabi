@@ -5,6 +5,7 @@
 \title{Plot tcplfit2 output with ggplot2}
 \usage{
 tcplggplotter(
+  endp,
   resp,
   bresp,
   conc,
@@ -15,6 +16,7 @@ tcplggplotter(
   shift,
   params,
   summary,
+  verbose.plot,
   unit.conc = paste0("μ", "M")
 )
 }
@@ -57,7 +59,9 @@ is a sublist with elements including:
 
 \item{summary}{list of tcplfit2 analysis output returned from tcplfit2::tcplhit2_core}
 
-\item{unit.conc}{- unit of chemical concentration. Defaults to $\mu$M}
+\item{verbose.plot}{If TRUE, ggplots will have a caption listing summarizing statistics (default TRUE)}
+
+\item{unit.conc}{unit of chemical concentration (default $\mu$M)}
 }
 \value{
 A ggplot2 object of tcplfit2 analysis displaying...
@@ -74,7 +78,7 @@ A ggplot2 object of tcplfit2 analysis displaying...
 Plot tcplfit2 output with ggplot2
 }
 \details{
-Last edit: 11/02/2021
+Last edit: 12/13/2021
 Roxygen created this manual page on `r Sys.Date()` using R version
 `r getRversion()`.
 Used in conjunction with concRespCoreZR() and tcplfit2_coreZR().

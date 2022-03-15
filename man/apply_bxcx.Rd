@@ -34,7 +34,7 @@ mc0 formatted table with Box-Cox transformed rvals
 Applies Box-Cox power transformation to mc0 rval with goal
 of normalizing data. Requires estimating an optimal
 lambda paramater, lambda.hat. Lambda.hat is chosen via
-MLE estimation using control data. Shift parameter is
+MLE using control data. Shift parameter is
 included if data is less than or equal to 0. Shift
 parameter equals floor(minimum observed rval).
 }

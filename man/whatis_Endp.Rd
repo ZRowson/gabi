@@ -15,7 +15,7 @@ endpoint name in expanded form
 \description{
 Expands endpoint acronym when given acronym in string form.
 
-Created 11/02/2021. Last edit 11/02/21.
+Created 11/02/2021. Last edit 12/13/21.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}
