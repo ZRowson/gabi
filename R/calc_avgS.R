@@ -4,11 +4,11 @@
 #'
 #' @description
 #' Calculates average speed per light level (dark or light) for
-#' individual fish. User provides a pmr0 table and inputs
+#' individual fish. User provides a lmr0 table and inputs
 #' number of time periods for each experimental stage:
-#' acclimation, light, and dark. A pmr0 table
+#' acclimation, light, and dark. A lmr0 table
 #'
-#' @details Last edit 09/28/21.
+#' @details Last edit 08/18/2022.
 #'
 #' @param data is a pmr0 formatted data.table
 #'   \itemize{

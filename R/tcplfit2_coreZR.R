@@ -1,18 +1,18 @@
 #' Concentration-response curve fitting EDIT by Zachary Rowson
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
-#' Last Edit: 12/09/2021
 #'
-#'
-#' Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
-#' remove default plotting method provided by tcplfit2. Replaces plotting method
-#' with declaration of a logical to be passed to gabi::concRespCoreZR
-#' wrapper function to determine if gabi::tcplggplotter should be run.
-#'
+#' @details Last Edit: 08/18/2022
 #' EDIT Tracking
 #' Edits
 #' 1) add name, and assay to parameters
 #' 2) add can.plot to return
+#'
+#' @description
+#' Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
+#' remove default plotting method provided by tcplfit2. Replaces plotting method
+#' with declaration of a logical to be passed to gabi::concRespCoreZR
+#' wrapper function to determine if gabi::tcplggplotter should be run.
 #'
 #'
 #' @param conc Vector of concentrations (NOT in log units).

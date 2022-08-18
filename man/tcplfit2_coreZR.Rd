@@ -68,7 +68,17 @@ is a sublist with elements including:
   }
 }
 \description{
-Concentration-response curve fitting EDIT by Zachary Rowson
+Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
+remove default plotting method provided by tcplfit2. Replaces plotting method
+with declaration of a logical to be passed to gabi::concRespCoreZR
+wrapper function to determine if gabi::tcplggplotter should be run.
+}
+\details{
+Last Edit: 08/18/2022
+EDIT Tracking
+Edits
+1) add name, and assay to parameters
+2) add can.plot to return
 }
 \examples{
 conc <- c(.03, .1, .3, 1, 3, 10, 30, 100)
@@ -80,16 +90,4 @@ output <- tcplfit2_core(conc, resp, .8,
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}
-Last Edit: 12/09/2021
-
-
-Edit of original tcplfit2 function tcplfit2::tcplfit2_core. Editted to
-remove default plotting method provided by tcplfit2. Replaces plotting method
-with declaration of a logical to be passed to gabi::concRespCoreZR
-wrapper function to determine if gabi::tcplggplotter should be run.
-
-EDIT Tracking
-Edits
-1) add name, and assay to parameters
-2) add can.plot to return
 }

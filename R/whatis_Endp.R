@@ -5,6 +5,7 @@
 #' @description
 #' Expands endpoint acronym when given acronym in string form.
 #'
+#' @details
 #' Created 11/02/2021. Last edit 12/13/21.
 #'
 #' @param endp string of endpoint name in acronym form

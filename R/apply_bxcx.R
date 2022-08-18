@@ -1,30 +1,32 @@
 #' Apply Box-Cox transformation to rval
-#'   Zachary Rowson
-#'   Rowson.Zachary at epa.gov
-#'   Last edit: 08/30/2021
 #'
+#' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
+#'
+#' @description
 #' Applies Box-Cox power transformation to mc0 rval with goal
 #' of normalizing data. Requires estimating an optimal
-#' lambda paramater, lambda.hat. Lambda.hat is chosen via
+#' lambda parameter, lambda.hat. Lambda.hat is chosen via
 #' MLE using control data. Shift parameter is
 #' included if data is less than or equal to 0. Shift
 #' parameter equals floor(minimum observed rval).
 #'
+#' @details Last edit: 08/18/2022
+#'
 #' @param data is a mc0 dataset formatted as below.
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-#'       Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item acid - assay component id (Here ZFlmrA/L/D-20-40-40)
+#'       Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
 #'     \item coli - column on plate
 #'     \item wllt - well type according to tcpl mc0 format
-#'      t = test, v = vehicle control
+#'      t = test, v = vehicle control, c/o = positive control
 #'     \item wllq - well quality indicates if observation is viable for analysis
 #'       1 = yes, 0 = no
 #'     \item conc - concentration of chemical
-#'     \item rval - endpoint of interest
+#'     \item rval - response value, endpoint of interest
 #'   }
 #' @return mc0 formatted table with Box-Cox transformed rvals
 #'

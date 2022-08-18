@@ -2,10 +2,7 @@
 % Please edit documentation in R/data_egids.R
 \name{data_egids}
 \alias{data_egids}
-\title{Identify experimental groups
-  Zachary Rowson
-  Rowson.Zachary at epa.gov
-  Last edit: 05/13/2021}
+\title{Identify experimental groups}
 \usage{
 data_egids(data)
 }
@@ -13,8 +10,8 @@ data_egids(data)
 \item{table}{is a mc0 dataset formatted as below.
 \itemize{
   \item srcf - name of file that is being formatted
-  \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-    Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+  \item acid - assay component id (Here ZFlmrA/L/D-20-40-40)
+    Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
   \item cpid - chemical name
   \item apid - assay plate id DNT###
   \item rowi - row on plate
@@ -40,4 +37,10 @@ as a list with chemical names in each group and plate
 id's in each group.
 Note: Experimental groups are defined after bad quality
 plates and concentration groups are removed in
+}
+\details{
+Last edit: 08/18/2022
+}
+\author{
+Zachary Rowson \email Rowson.Zachary at epa.gov
 }

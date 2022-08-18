@@ -42,7 +42,7 @@ User provides a pmr0 table and specifies number of time periods per
 experimental stage: acclimation, light, and dark.
 }
 \details{
-Last edit 09/27/21.
+Last edit 08/18/2022.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

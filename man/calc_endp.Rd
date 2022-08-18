@@ -2,12 +2,12 @@
 % Please edit documentation in R/calc_endp.R
 \name{calc_endp}
 \alias{calc_endp}
-\title{Calculate endpoint values from pmr0 formatted table}
+\title{Calculate endpoint values from lmr0 formatted table}
 \usage{
 calc_endp(data, no.A = 10, no.L = 20, no.D = 20, rval = NULL)
 }
 \arguments{
-\item{data}{is a pmr0 formatted data.table
+\item{data}{is a lmr0 formatted data.table
 \itemize{
   \item srcf - name of file that is being formatted
   \item acid - assay component id
@@ -60,7 +60,7 @@ conversion with gabi::as_mc0.
 \details{
 Details on what endpoints represent can be found
 by searching for appropriate calc_ function (?gabi::calc_...).
-Last edit 09/28/21.
+Last edit 08/18/2022.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

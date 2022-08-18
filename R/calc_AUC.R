@@ -8,7 +8,7 @@
 #' User provides a pmr0 table and specifies number of time periods per
 #' experimental stage: acclimation, light, and dark.
 #'
-#' @details Last edit 09/27/21.
+#' @details Last edit 08/18/2022.
 #'
 #' @param data is a pmr0 formatted data.table
 #'   \itemize{

@@ -35,14 +35,14 @@ A list with habituation ednpoints for each fish
   }
 }
 \description{
-Calculates measures of habituation per ligh period (light or dark).
-User provides a pmr0 table and inputs
+Calculates measures of habituation per light period (light or dark).
+User provides a lmr0 table and inputs
 number of time periods in each experimental stage:
 acclimation, light, and dark.
 }
 \details{
 hbt_L = max(speed in light) / min(speed in light), hbt_D = max(speed in dark) / min(speed in dark).
-Created 09/28/2021. Last edit 09/28/21.
+Created 09/28/2021. Last edit 08/18/2022.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

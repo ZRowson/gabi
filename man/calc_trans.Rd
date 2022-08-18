@@ -7,7 +7,7 @@
 calc_trans(data, no.A = 10, no.L = 20, no.D = 20)
 }
 \arguments{
-\item{data}{is a pmr0 formatted data.table
+\item{data}{is a lmr0 formatted data.table
 \itemize{
   \item srcf - name of file that is being formatted
   \item acid - assay component id
@@ -33,18 +33,15 @@ A list with vectors of transitory endpoint values for each fish
     \item strtlA - "startle acceleration" acceleration at startle
     \item strtlAavg - "startle acceleration from average" acceleration at startle when speed in dark is compared to average speed in light
     \item strtlF - "startle factor" fold change in speed at startle
-    \item frzA - "freeze acceleration" acceleration at freeze behavior
-    \item frzF - "freeze factor" fold change in speed at freeze
   }
 }
 \description{
 Calculates transition endpoints from user provided behavioral data.
 Transition endpoints describe fish behavior at transitions between
-different light levels: freeze (dark to light) and startle
-(light to dark).
+different light levels: startle (light to dark).
 }
 \details{
-Last edit 09/28/2021.
+Last edit 08/18/2022.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

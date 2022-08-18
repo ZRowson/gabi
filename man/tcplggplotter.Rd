@@ -75,19 +75,6 @@ A ggplot2 object of tcplfit2 analysis displaying...
     }
 }
 \description{
-Plot tcplfit2 output with ggplot2
-}
-\details{
-Last edit: 12/13/2021
-Roxygen created this manual page on `r Sys.Date()` using R version
-`r getRversion()`.
-Used in conjunction with concRespCoreZR() and tcplfit2_coreZR().
-Not meant to be used as a stand alone function. Graphics are meant to replicate
-appearance of default graphics produced in tcplfit2::tcplfit2_core.
-}
-\author{
-Zachary Rowson \email{Rowson.Zachary@epa.gov}
-
 Plots concentration response trend of multiple-concentration experiment
 on a chemical. tcplfit2 functions are used to produce interpolating
 fits on chemical response.
@@ -103,4 +90,15 @@ fits on chemical response.
   \item exp4 - exponential of 4th degree
   \item exp5 - exponential of 4th degree
   }
+}
+\details{
+Last edit: 12/13/2021
+Roxygen created this manual page on `r Sys.Date()` using R version
+`r getRversion()`.
+Used in conjunction with concRespCoreZR() and tcplfit2_coreZR().
+Not meant to be used as a stand alone function. Graphics are meant to replicate
+appearance of default graphics produced in tcplfit2::tcplfit2_core.
+}
+\author{
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 }

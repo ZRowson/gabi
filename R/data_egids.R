@@ -1,8 +1,10 @@
 #' Identify experimental groups
-#'   Zachary Rowson
-#'   Rowson.Zachary at epa.gov
-#'   Last edit: 05/13/2021
 #'
+#' @author Zachary Rowson \email Rowson.Zachary at epa.gov
+#'
+#' @details Last edit: 08/18/2022
+#'
+#' @description
 #' Takes a mc0 data.table and uses plate numbers to return
 #' experimental groups. Experimental groups are returned
 #' as a list with chemical names in each group and plate
@@ -13,8 +15,8 @@
 #' @param table is a mc0 dataset formatted as below.
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item acid - assay component id (Here ZFlmrA/L/D-20-40-40)
+#'       Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -32,15 +34,13 @@
 #'   }
 #'
 #' @import data.table
+#'
 #' @export
 data_egids <- function(data) {
                   table <- data.table::copy(data)
                   # Find unique plate ids for each test chemical
-                    chm.plts <- table[wllt == "t", .(apids = .(unique(c(apid)) %>%
-                                                                 sort()
-                                                               )
-                                                    ), by = cpid
-                                      ]
+                    chm.plts <- table[wllt == "t", .(apids = .( sort( unique(c(apid)) ) )),
+                                      by = cpid]
                   # Find unique plate groups. Some chemicals were tested together
                     grps <- unique(chm.plts[, apids])
                   # Concatenate names of chemicals tested together into vectors

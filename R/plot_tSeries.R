@@ -11,7 +11,7 @@
 #'
 #' @details
 #' Created: 10/06/2021
-#' Last edit: 1/21/2022
+#' Last edit: 08/18/2022
 #'
 #' Subject Specific (SS) perspective fits curves to each individual's speed data
 #' and plots. Population Averaged (SA) perspective fits to the mean speed at each
@@ -20,8 +20,8 @@
 #' @param pmr0 - is a pmr0 dataset formatted as below
 #'   \itemize{
 #'     \item srcf - name of file holding raw data
-#'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
-#'       Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item acid - assay component id (Here ZFlmrALD-20-40-40)
+#'       Zebrafish locomotor resonse, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -59,30 +59,22 @@
 #' @import ggplot2
 #' @import data.table
 #' @export
-plot_tSeries <- function(pmr0, chemical, vector, prsp = "SA", no.A = 10, unit.t = "2 min", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
+plot_tSeries <- function(pmr0, chemical, prsp = "SA", no.A = 10, unit.t = "2 min", unit.mov = "cm", unit.conc = paste0("\U03BC","M")) {
 
 
   # convert to data.table format and find egids
   pmr0 <- as.data.table(pmr0)
   data <- gabi::data_egids(pmr0)
 
-  #### determine the vector quantity being described ####
-
-  ## if "vt" is present in colnames then speed is being described. "aj" => acceleration and "jx" => jerk
-  colnames <- names(pmr0)
-  bool.mat <- sapply(c("vt","aj","jx"), grepl, x=colnames)
-  any.true <- apply(bool.mat, 2, function(col) any(col==TRUE))
-  vector <- names(which(any.true == TRUE))
-
-  #### end ###
   #### extract data of interest ####
 
   ## identify group of interest
   group <- unique(data[cpid == chemical, egid])
 
-  ## identify vector columns describing acclimation
-  vec.cols <- grep(vector, colnames, value = TRUE)
-  A.cols <- vec.cols[(1:grep(no.A, vec.cols))]
+  ## Identify movement columns of interest
+  t.cols <- grep("vt", names(data), value = TRUE)
+  cols <- t.cols[(no.A+1):length(t.cols)]
+  A.cols <- t.cols[!(t.cols%in%cols)]
 
   ## extract data to be plotted, exclude acclimation
   to.fit <- data[cpid==chemical | (wllt=="v" & egid==group), -A.cols, with=FALSE]
@@ -92,18 +84,9 @@ plot_tSeries <- function(pmr0, chemical, vector, prsp = "SA", no.A = 10, unit.t 
   #### plot ####
 
   # create appropriate axes titles for plots
-  if (vector == "vt") {
-    label.y <- "Speed"
-    t.power <- ""
-  } else if(vector == "aj") {
-    label.y <- "Acceleration"
-    t.power <- "2"
-  } else if(vector == "jx") {
-    label.y <- "Jerk"
-    t.power <- "3"
-  }
+  label.y <- "Speed"
 
-  # plot either as SS or PA
+  # plot either as SS or SA
 
   ## SS plotting
   if (prsp == "SS") {
@@ -113,7 +96,8 @@ plot_tSeries <- function(pmr0, chemical, vector, prsp = "SA", no.A = 10, unit.t 
     ## elongate data
     to.fit_long <- data.table::melt(to.fit, id.vars = c(names(to.fit)[1:9],"egid"),
                                     variable.name = "t", value.name = "val")
-    to.fit_long[, t := sub(vector, "", t)]
+    to.fit_long[, t := sub("vt", "", t)]
+    to.fit_long[, t := as.numeric(t)]
 
     # plot time-series data
 
@@ -122,19 +106,19 @@ plot_tSeries <- function(pmr0, chemical, vector, prsp = "SA", no.A = 10, unit.t 
 
     ## add units to plot labels
     label.t <- paste0("Time (", unit.t, ")")
-    label.mov <- paste0(label.y, " (", unit.mov, "/", unit.t, t.power, ")")
+    label.mov <- paste0(label.y, " (", unit.mov, "/", unit.t, ")")
     val.conc <- unique(to.fit[,conc])
     label.conc <- paste0(val.conc, unit.conc)
     names(label.conc) <- val.conc
 
     ## set color scheme
-    n <- length(unique(to.fit[,conc]))
-    colors <- viridis::viridis(n)
+    m <- length(unique(to.fit[,conc]))
+    colors <- viridis::viridis(m)
 
     # set x-axis breaks and labels
-    m <- max(to.fit_long[,t])
-    breaks <- as.character(seq(from=no.A,to=m,by=5))
-    labels <- as.character(seq(from=no.A,to=m,by=5))
+    l <- max(to.fit_long[,t])
+    breaks <- as.character(seq(from=no.A,to=l,by=5))
+    labels <- as.character(seq(from=no.A,to=l,by=5))
 
     ## plot
     plot <- ggplot(data = to.fit_long) +
@@ -157,27 +141,25 @@ plot_tSeries <- function(pmr0, chemical, vector, prsp = "SA", no.A = 10, unit.t 
     # format data for plotting
 
     ## calculate mean and 50% CIs for each vector column by concentration group, excluding concentration
-    exclude.A <- vec.cols[-which(vec.cols%in%A.cols)]
+    exclude.A <- t.cols[!(t.cols%in%A.cols)]
     means <- to.fit[, lapply(.SD, function(col) mean(col,na.rm=T)),
                     .SDcols = exclude.A,
                     by = conc]
 
-    ## calculate CI's for transformed values then tranform back
-    if (vector == "vt") {
-      shift <- 1
-    } else if(vector=="aj" | vector=="jx") {
-      shift <- abs(min(to.fit[, lapply(.SD,min,na.rm=TRUE), .SDcols=exclude.A])) + 1
-    }
+    ## calculate CI's for transformed values then transform back
+    shift <- 1
     logCIs <- to.fit[, lapply(.SD, function(x) log10(x+shift)), .SDcols=exclude.A, by=conc][
                       , lapply(.SD, function(x) t.test(x,conf.level=0.50)$conf.int), .SDcols=exclude.A, by=conc]
-    CIs <- logCIs[, lapply(.SD, function(x) (10^x)-shift), by=conc][,lapply(.SD, function(col) abs(diff(col))/2), .SDcols=exclude.A, by=conc]
+    CIs <- logCIs[, lapply(.SD, function(x) (10^x)-shift), by=conc][
+      ,lapply(.SD, function(col) abs(diff(col))/2), .SDcols=exclude.A, by=conc]
 
     ## elongate means and CIs data, and join
     means_long <- data.table::melt(means, id.vars = "conc", variable.name = "t", value.name = "mean")
-    means_long[, t := sub(vector,"",t)]
+    means_long[, t := sub("vt","",t)]
     CIs_long <- data.table::melt(CIs, id.vars = "conc", variable.name = "t", value.name = "CI")
-    CIs_long[, t := sub(vector,"",t)]
+    CIs_long[, t := sub("vt","",t)]
     stats <- means_long[CIs_long, on = c("conc","t")][, conc := as.factor(conc)]
+    stats[, t := as.numeric(t)]
 
     # create standard error of mean estimates by time period and plot as ribbons or error bars
 

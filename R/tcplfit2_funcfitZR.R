@@ -2,6 +2,7 @@
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
+#' @description
 #' Returns a function with fitted parameters from tcplfit2 model fitting.
 #' Goal here is to provide a function for visualization with
 #' gabi::tcplggplotter

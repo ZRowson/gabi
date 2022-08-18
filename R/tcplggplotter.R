@@ -2,6 +2,7 @@
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
+#' @description
 #' Plots concentration response trend of multiple-concentration experiment
 #' on a chemical. tcplfit2 functions are used to produce interpolating
 #' fits on chemical response.
@@ -182,7 +183,8 @@ tcplggplotter <- function(endp, resp, bresp, conc, logc, rmds, bmed, lam.hat, sh
                                    y = expression(paste("Response - ", bar("Vehicle Control Response"))),
                                    caption = caption) +
                               scale_x_continuous(trans = "log10", breaks = x.breaks, labels = x.labels) +
-                              theme_bw()
+                              theme_bw() +
+                              theme(text=element_text(size=14))
                     return(plot)
 }
 

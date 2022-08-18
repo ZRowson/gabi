@@ -17,8 +17,8 @@ plot_eDist(
 \item{mc0}{- is a mc0 dataset formatted as below
 \itemize{
   \item srcf - name of file holding raw data
-  \item acid - assay component id (Here ZFpmrALD-20-40-40)
-    Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+  \item acid - assay component id (Here ZFlmrALD-20-40-40)
+    Zebrafish locomotor resonse, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
   \item cpid - chemical name
   \item apid - assay plate id DNT###
   \item rowi - row on plate

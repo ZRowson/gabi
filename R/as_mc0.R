@@ -3,17 +3,17 @@
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
 #' @description
-#' Formats a pmr0 formatted dataset into mc0 format for
+#' Formats a lmr0 formatted dataset into mc0 format for
 #' tcpl analysis. Requires the creation of endpoints via
 #' gabi::create_endp().
 #'
-#' @details Last Edit: 02/11/2022
+#' @details Last Edit: 08/18/2022
 #'
-#' @param table is a pmr0 dataset formatted as below
+#' @param table is a lmr0 dataset formatted as below
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (ZFpmrALD-l-m-n)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-l minutes-m minutes-n minutes
+#'     \item acid - assay component id (ZFlmrALD-l-m-n)
+#'       Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id
 #'     \item rowi - row on plate
@@ -34,18 +34,18 @@
 #' @return A mc0 format data.table
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (ZFpmrA/L/D-l-m-n)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-l minutes-m minutes-n minutes
+#'     \item acid - assay component id (ZFlmrA/L/D-l-m-n)
+#'       Zebrafish locomotor response, Acclimation/Light/Dark-l minutes-m minutes-n minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id
 #'     \item rowi - row on plate
 #'     \item coli - column on plate
 #'     \item wllt - well type according to tcpl mc0 format
-#'      t = test, v = vehicle control
+#'      t = test, v = vehicle control, c/o = positive control
 #'     \item wllq - well quality indicates if observation is viable for analysis
-#'       1 = yes, 0 = no, c/o = positive control
+#'       1 = yes, 0 = no
 #'     \item conc - concentration of chemical
-#'     \item rval - endpoints resp values of each fish
+#'     \item rval - endpoint response values of each fish
 #'   }
 #' @import data.table
 #' @export

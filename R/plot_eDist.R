@@ -19,8 +19,8 @@
 #' @param mc0 - is a mc0 dataset formatted as below
 #'   \itemize{
 #'     \item srcf - name of file holding raw data
-#'     \item acid - assay component id (Here ZFpmrALD-20-40-40)
-#'       Zebrafish photomotor resonse, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item acid - assay component id (Here ZFlmrALD-20-40-40)
+#'       Zebrafish locomotor resonse, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -61,7 +61,7 @@ plot_eDist <- function(mc0, chemical, unit.conc = paste0("\U03BC","M"), plot.log
 
                 ## isolate endpoint name
                 acid <- unique(mc0[,acid])
-                endp <- gsub("_ZFpmrALD-20-40-40", "", acid)
+                endp <- gsub("_ZFlmrALD-20-40-40", "", acid)
 
                 ## save labels as objects
                 title <- paste0(chemical, " Exposure: ", "Boxplots of ", endp, " Values")

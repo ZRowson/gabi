@@ -1,7 +1,8 @@
 #' Concentration Response Core - ZR Edits
-#' Last Edit: 02/08/2022
 #'
+#' @details Last Edit: 02/08/2022
 #'
+#' @description
 #' EDIT by Zachary Rowson (Rowson.Zachary#epa.gov).
 #' Edit Tracking:
 #' 1) force.fit = TRUE
@@ -13,7 +14,6 @@
 #' 6) call to gabi::tcplggplotter and declaration of plot object
 #' 7) add parameter verbose.plot
 #'   a) logical indicator that decides if plot should have caption listing summarizing statistics
-#'
 #'
 #' Core of concentration response curve fitting for pvalue based cutoff. This
 #' function calls tcplfit2_core to get curve fits, and then tcplhit2_core to

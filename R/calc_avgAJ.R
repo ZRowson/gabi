@@ -4,15 +4,15 @@
 #'
 #' @description
 #' Calculates average acceleration and jerk per light level (dark or
-#' light) for individual fish. User provides a pmr0 table and inputs
+#' light) for individual fish. User provides a lmr0 table and inputs
 #' number of time periods for each experimental stage: acclimation,
 #' light, and dark.
 #'
 #' @details Excludes acceleration and jerk values during transitions
 #' (freeze and startle) from calculation of averages.
-#' Last edit 09/28/21.
+#' Last edit 08/18/2022.
 #'
-#' @param data is a pmr0 formatted data.table
+#' @param data is a lmr0 formatted data.table
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id

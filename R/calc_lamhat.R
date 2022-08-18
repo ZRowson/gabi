@@ -1,8 +1,9 @@
 #' Calculate lambda.hat for Box-Cox transformation
-#'   Zachary Rowson
-#'   Rowson.Zachary at epa.gov
-#'   Last edit: 05/14/2021
+#' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
+#' @details Last edit: 05/14/2021
+#'
+#' @description
 #' Calculates parameters for Box-Cox power transformation from data. Uses
 #' MLE estimation based on residuals of linear model (rval + shift ~ egid).
 #'
@@ -11,8 +12,8 @@
 #'   \itemize{
 #'     \item egid - experimental group id's
 #'     \item srcf - name of file that is being formatted
-#'     \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-#'       Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+#'     \item acid - assay component id (Here ZFlmrA/L/D-20-40-40)
+#'       Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
 #'     \item cpid - chemical name
 #'     \item apid - assay plate id DNT###
 #'     \item rowi - row on plate
@@ -37,8 +38,7 @@ calc_lamhat <- function (data) {
                   # Create linear model and estimate optimal lambda
                     # Find shift parameter
                     if (any(table[,rval] < 0, na.rm = TRUE)) {
-                      shift <- min(table[, rval], na.rm = TRUE) %>%
-                                floor() * (-1)
+                      shift <- floor( min(table[, rval], na.rm = TRUE) ) * (-1)
                     }  else if (any(table[,rval] == 0, na.rm = TRUE)) {
                       shift <- 1
                     } else shift <- 0

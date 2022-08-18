@@ -1,4 +1,4 @@
-#' Calculate endpoint values from pmr0 formatted table
+#' Calculate endpoint values from lmr0 formatted table
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
@@ -11,9 +11,9 @@
 #'
 #' @details Details on what endpoints represent can be found
 #' by searching for appropriate calc_ function (?gabi::calc_...).
-#' Last edit 09/28/21.
+#' Last edit 08/18/2022.
 #'
-#' @param data is a pmr0 formatted data.table
+#' @param data is a lmr0 formatted data.table
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id

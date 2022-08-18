@@ -16,7 +16,9 @@ Entries in params depend upon the model fit.}
 func - function form of model params provided
 }
 \description{
-Produce curve fit function for tcpl fits
+Returns a function with fitted parameters from tcplfit2 model fitting.
+Goal here is to provide a function for visualization with
+gabi::tcplggplotter
 }
 \details{
 Created: 09/09/2021
@@ -35,8 +37,4 @@ output <- tcplfit2_core(conc, resp, .8,
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}
-
-Returns a function with fitted parameters from tcplfit2 model fitting.
-Goal here is to provide a function for visualization with
-gabi::tcplggplotter
 }

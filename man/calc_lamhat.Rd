@@ -2,10 +2,7 @@
 % Please edit documentation in R/calc_lamhat.R
 \name{calc_lamhat}
 \alias{calc_lamhat}
-\title{Calculate lambda.hat for Box-Cox transformation
-  Zachary Rowson
-  Rowson.Zachary at epa.gov
-  Last edit: 05/14/2021}
+\title{Calculate lambda.hat for Box-Cox transformation}
 \usage{
 calc_lamhat(data)
 }
@@ -15,8 +12,8 @@ formatted as below.
   \itemize{
     \item egid - experimental group id's
     \item srcf - name of file that is being formatted
-    \item acid - assay component id (Here ZFpmrA/L/D-20-40-40)
-      Zebrafish photomotor resonse, Accilmation/Light/Dark-20 minutes-40 minutes-40 minutes
+    \item acid - assay component id (Here ZFlmrA/L/D-20-40-40)
+      Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
     \item cpid - chemical name
     \item apid - assay plate id DNT###
     \item rowi - row on plate
@@ -38,4 +35,10 @@ formatted as below.
 \description{
 Calculates parameters for Box-Cox power transformation from data. Uses
 MLE estimation based on residuals of linear model (rval + shift ~ egid).
+}
+\details{
+Last edit: 05/14/2021
+}
+\author{
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 }

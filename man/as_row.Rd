@@ -2,11 +2,7 @@
 % Please edit documentation in R/as_row.R
 \name{as_row}
 \alias{as_row}
-\title{Format chemical data into tcpl row object for tcpl analysis
-  Zachary Rowson
-  Rowson.Zachary at epa.gov
-  Created 06/01/2021
-  Last edit: 02/17/2022}
+\title{Format chemical data into tcpl row object for tcpl analysis}
 \usage{
 as_row(data, chemical, endp, lam.hat = 1, shift = 0)
 }
@@ -14,16 +10,16 @@ as_row(data, chemical, endp, lam.hat = 1, shift = 0)
 \item{data}{is a mc0 dataset formatted as below
 \itemize{
   \item srcf - name of file that is being formatted
-  \item acid - assay component id (Here ZFpmrALD-20-40-40)
-    Zebrafish photomotor response, Acclimation/Light/Dark-20 minutes-40 minutes-40 minutes
+  \item acid - assay component id (Here ZFlmrALD-20-40-40)
+    Zebrafish locomotor response, Acclimation/Light/Dark- _l_ minutes- _m_ minutes- _n_ minutes
   \item cpid - chemical name
   \item apid - assay plate id DNT###
   \item rowi - row on plate
   \item coli - column on plate
   \item wllt - well type according to tcpl mc0 format
-   t = test, v = vehicle control
+   t = test, v = vehicle control, c/o = positive control
   \item wllq - well quality indicates if observation is viable for analysis
-    1 = yes, 0 = noS
+    1 = yes, 0 = no
   \item conc - concentration of chemical
   \item rval - endpoints resp values of each fish
 }}
@@ -56,4 +52,10 @@ Formats a chemical data from a mc0 dataset into a row
 object for tcpl analysis. Row objects are lists of
 data and descriptive statistics necessary for tcpl
 analysis.
+}
+\details{
+Created 06/01/2021 Last edit: 08/18/2022
+}
+\author{
+Zachary Rowson \email{Rowson.Zachary@epa.gov}
 }

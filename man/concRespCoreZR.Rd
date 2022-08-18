@@ -2,8 +2,7 @@
 % Please edit documentation in R/concRespCoreZR.R
 \name{concRespCoreZR}
 \alias{concRespCoreZR}
-\title{Concentration Response Core - ZR Edits
-Last Edit: 02/08/2022}
+\title{Concentration Response Core - ZR Edits}
 \usage{
 concRespCoreZR(
   row,
@@ -83,11 +82,13 @@ Edit Tracking:
 6) call to gabi::tcplggplotter and declaration of plot object
 7) add parameter verbose.plot
   a) logical indicator that decides if plot should have caption listing summarizing statistics
-}
-\details{
+
 Core of concentration response curve fitting for pvalue based cutoff. This
 function calls tcplfit2_core to get curve fits, and then tcplhit2_core to
 perform the hitcalling.
+}
+\details{
+Last Edit: 02/08/2022
 }
 \examples{
 conc <- list(.03, .1, .3, 1, 3, 10, 30, 100)
