@@ -39,12 +39,14 @@
 #'     \item avgS_L - average speed in light
 #'     \item avgS_D - average speed in dark
 #'     \item avgS_T - average speed over whole time series
-#'     \item avgA_L - average acceleration in light
-#'     \item avgA_D - average acceleration in dark
-#'     \item avgJ_L - average jerk in light
-#'     \item avgJ_D - average jerk in dark
+#'     \item hbt1_L - approximate slope in light
+#'     \item hbt1_D - approximate slope in dark
+#'     \item hbt2_L - approximate curvature in light
+#'     \item hbt2_D - approximate curvature in dark
+#'     \item RoA_L - Range of Activity in light
+#'     \item RoA_D - Range of Activity in dark
 #'     \item strtlA - acceleration during startle, light-dark, transition
-#'     \item strtlAavg - difference between apeed in last period of dark and avgS_L
+#'     \item strtlAavg - difference between speed in last period of dark and avgS_L
 #'     \item strtlF - startle factor, ratio of speed in first period of dark over speed in last period of light
 #'     \item frzA - acceleration during freeze, dark-light, transition
 #'     \item frzF - freeze factor, ratio of speed in first period of light over speed in last period of acclimation
@@ -60,8 +62,8 @@ calc_endp <- function (data, no.A=10, no.L=20, no.D = 20, rval = NULL) {
 
 
                 if (is.null(rval) || !(rval %in% c("AUC_L", "AUC_D", "AUC_T", "AUC_r", "avgS_L", "avgS_D",
-                                                   "avgS_T", "avgA_L", "avgA_D", "avgJ_L", "avgJ_D","strtlA",
-                                                   "strtlAavg", "strtlF", "frzA","frzF", "hbt_L", "hbt_D"))) {
+                                                   "avgS_T", "hbt1_L", "hbt1_D", "hbt2_L", "hbt2_D","strtlA",
+                                                   "strtlAavg", "strtlF", "frzA","frzF", "RoA_L", "RoA_D"))) {
                   stop("rval improperly specified")
                 }
 
@@ -73,12 +75,12 @@ calc_endp <- function (data, no.A=10, no.L=20, no.D = 20, rval = NULL) {
                       endp <- gabi::calc_AUC(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("avgS_L", "avgS_D", "avgS_T")) {
                       endp <- gabi::calc_avgS(data.df, no.A, no.L, no.D)[[rval]]
-                  } else if (rval %in% c("avgA_L", "avgA_D", "avgJ_L", "avgJ_D")) {
-                      endp <- gabi::calc_avgAJ(data.df, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("hbt1_L", "hbt1_D", "hbt2_L", "hbt2_D")) {
+                      endp <- gabi::calc_hbt(data.df, no.A, no.L, no.D)[[rval]]
                   } else if (rval %in% c("frzA","frzF","strtlA", "strtlAavg", "strtlF")) {
                       endp <- gabi::calc_trans(data.df, no.A, no.L, no.D)[[rval]]
-                  } else if (rval %in% c("hbt_L", "hbt_D")) {
-                    endp <- gabi::calc_hbt(data.df, no.A, no.L, no.D)[[rval]]
+                  } else if (rval %in% c("RoA_L", "RoA_D")) {
+                    endp <- gabi::calc_RoA(data.df, no.A, no.L, no.D)[[rval]]
                   }
 
 

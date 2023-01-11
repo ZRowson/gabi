@@ -1,17 +1,19 @@
-#' Calculate measures of habituation per light level for individual fish
+#' Calculate Habituation Measurements
 #'
 #' @author Zachary Rowson \email{Rowson.Zachary@@epa.gov}
 #'
 #' @description
-#' Calculates measures of habituation per light period (light or dark).
-#' User provides a lmr0 table and inputs
-#' number of time periods in each experimental stage:
-#' acclimation, light, and dark.
+#' Calculates approximation slope of activity trends with time (Habituation 1)
+#'  and approximate curvature of activity trends with time (Habituation 2)
+#' (dark or Light) for individual fish. User provides a lmr0 table and inputs
+#' number of time periods for each experimental stage: Acclimation,
+#' Light, and Dark.
 #'
-#' @details hbt_L = max(speed in light) / min(speed in light), hbt_D = max(speed in dark) / min(speed in dark).
-#' Created 09/28/2021. Last edit 08/18/2022.
+#' @details Excludes Habituation 1 and Habituation 2 values during transitions
+#' (freeze and startle) from calculation of averages.
+#' Last edit 11/15/2022.
 #'
-#' @param data is a pmr0 formatted data.table
+#' @param data is a lmr0 formatted data.table
 #'   \itemize{
 #'     \item srcf - name of file that is being formatted
 #'     \item acid - assay component id
@@ -28,26 +30,43 @@
 #' @param no.L number of measurements made in light period
 #' @param no.D number of measurements made in dark period
 #'
-#' @return A list with habituation ednpoints for each fish
+#' @return A list with average jerk in each light level for each fish
 #'   \itemize{
-#'     \item hbt_L - speed ratio in light. max(speed) / min(speed)
-#'     \item hbt_D - speed ratio in dark. max(speed) / min(speed)
+#'     \item hbt1_L - average acceleration in light
+#'     \item hbt1_D - average acceleration in dark
+#'     \item hbt2_L - average jerk in light
+#'     \item hbt2_D - average jerk in dark
 #'   }
 #' @export
 calc_hbt <- function(data, no.A = 10, no.L = 20, no.D = 20) {
 
-  rownames(data) <- NULL
-  # find time-periods and sets corresponding to light and dark
-  t <- grep("vt", names(data), value = TRUE)
-  sets <- list(hbt_L = t[(no.A+1):(no.A+no.L)],
-               hbt_D = t[(no.A+no.L+1):(no.A+no.L+no.D)])
-  # calculate average speed in light and dark per fish
-  hbt <- lapply(sets, function(set) {
-    temp <- data[set]
-    max <- apply(temp, 1, max)
-    min <- apply(temp, 1, min)
-    max / (min+1)
-  })
+              # iteratively calculate acceleration and jerk values
 
-  return(hbt)
+                rownames(data) <- NULL
+                t <- grep("vt", names(data), value = TRUE)
+
+              # calculate acceleration data
+                for (i in 2:50) {
+                  n <- t[i]; `n-1` <- t[i-1]
+                  data[, ncol(data)+1] <- data[[`n`]] - data[[`n-1`]]
+                  colnames(data)[ncol(data)] <- paste0("za", `i`)
+                }
+
+              # calculate jerk data
+                t_a <- grep("za", names(data), value = TRUE)
+                for (i in 3:50) {
+                  n <- t_a[i-1]
+                  `n-1` <- t_a[i-2]
+                  data[[paste0("zj", i)]] <- data[[n]] - data[[`n-1`]]
+                }
+                t_j <- grep("zj", names(data), value = TRUE)
+              # calculate average acceleration in light and dark per fish
+                sets <- list(hbt1_L = t_a[(no.A+1):(no.A+no.L-1)],
+                             hbt1_D = t_a[(no.A+no.L+1):(no.A+no.L+no.D-1)],
+                             hbt2_L = t_j[(no.A+1):(no.A+no.L-2)],
+                             hbt2_D = t_j[(no.A+no.L+1):(no.A+no.L+no.D-2)]
+                        )
+                hbt <- lapply(sets, function(set) rowMeans(data[set]))
+
+              return(hbt)
 }

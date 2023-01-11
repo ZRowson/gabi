@@ -2,12 +2,12 @@
 % Please edit documentation in R/calc_hbt.R
 \name{calc_hbt}
 \alias{calc_hbt}
-\title{Calculate measures of habituation per light level for individual fish}
+\title{Calculate Habituation Measurements}
 \usage{
 calc_hbt(data, no.A = 10, no.L = 20, no.D = 20)
 }
 \arguments{
-\item{data}{is a pmr0 formatted data.table
+\item{data}{is a lmr0 formatted data.table
 \itemize{
   \item srcf - name of file that is being formatted
   \item acid - assay component id
@@ -28,21 +28,25 @@ calc_hbt(data, no.A = 10, no.L = 20, no.D = 20)
 \item{no.D}{number of measurements made in dark period}
 }
 \value{
-A list with habituation ednpoints for each fish
+A list with average jerk in each light level for each fish
   \itemize{
-    \item hbt_L - speed ratio in light. max(speed) / min(speed)
-    \item hbt_D - speed ratio in dark. max(speed) / min(speed)
+    \item hbt1_L - average acceleration in light
+    \item hbt1_D - average acceleration in dark
+    \item hbt2_L - average jerk in light
+    \item hbt2_D - average jerk in dark
   }
 }
 \description{
-Calculates measures of habituation per light period (light or dark).
-User provides a lmr0 table and inputs
-number of time periods in each experimental stage:
-acclimation, light, and dark.
+Calculates approximation slope of activity trends with time (Habituation 1)
+ and approximate curvature of activity trends with time (Habituation 2)
+(dark or Light) for individual fish. User provides a lmr0 table and inputs
+number of time periods for each experimental stage: Acclimation,
+Light, and Dark.
 }
 \details{
-hbt_L = max(speed in light) / min(speed in light), hbt_D = max(speed in dark) / min(speed in dark).
-Created 09/28/2021. Last edit 08/18/2022.
+Excludes Habituation 1 and Habituation 2 values during transitions
+(freeze and startle) from calculation of averages.
+Last edit 11/15/2022.
 }
 \author{
 Zachary Rowson \email{Rowson.Zachary@epa.gov}

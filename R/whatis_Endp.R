@@ -20,10 +20,10 @@ whatis_Endp <- function(endp) {
                   AUC_L <- "Area Under Curve in Light"
                     AUC_L.sub <- "AUC's calculated with trapezoidal rule "
                   avgS_L <- "Average Speed in Light"
-                  avgA_L <- "Average Acceleration in Light"
-                  avgJ_L <- "Average Jerk in Light"
-                  hbt_L <- "Habituation in Light"
-                    hbt_L.sub <- "hbt_L calculated as ratio of maximum to minumum speed in Light "
+                  hbt1_L <- "Approximate Slope in Light"
+                  hbt2_L <- "Approximate Curvature in Light"
+                  RoA_L <- "Range of Activity in Light"
+                    RoA_L.sub <- "RoA_L calculated as ratio of maximum to minumum speed in Light "
 
                   ## describes Transition
                   strtlA <- "Startle Acceleration"
@@ -37,10 +37,10 @@ whatis_Endp <- function(endp) {
                   AUC_D <- "Area Under Curve in Dark"
                     AUC_D.sub <- "AUC's calculated with trapezoidal rule "
                   avgS_D <- "Average Speed in Dark"
-                  avgA_D <- "Average Acceleration in Dark"
-                  avgJ_D <- "Average Jerk in Dark"
-                  hbt_D <- "Habituation in Dark"
-                    hbt_D.sub <- "hbt_D calculated as ratio of maximum to minumum speed in Dark "
+                  hbt1_D <- "Approximate Slope in Dark"
+                  hbt2_D <- "Approximate Curvature in Dark"
+                  RoA_D <- "Habituation in Dark"
+                    RoA_D.sub <- "hbt_D calculated as ratio of maximum to minumum speed in Dark "
 
                   ## miscellaneous endpoints
                   AUC_T <- "Area Under Curve over Total experimental period"

@@ -36,12 +36,14 @@ calc_endp(data, no.A = 10, no.L = 20, no.D = 20, rval = NULL)
   \item avgS_L - average speed in light
   \item avgS_D - average speed in dark
   \item avgS_T - average speed over whole time series
-  \item avgA_L - average acceleration in light
-  \item avgA_D - average acceleration in dark
-  \item avgJ_L - average jerk in light
-  \item avgJ_D - average jerk in dark
+  \item hbt1_L - approximate slope in light
+  \item hbt1_D - approximate slope in dark
+  \item hbt2_L - approximate curvature in light
+  \item hbt2_D - approximate curvature in dark
+  \item RoA_L - Range of Activity in light
+  \item RoA_D - Range of Activity in dark
   \item strtlA - acceleration during startle, light-dark, transition
-  \item strtlAavg - difference between apeed in last period of dark and avgS_L
+  \item strtlAavg - difference between speed in last period of dark and avgS_L
   \item strtlF - startle factor, ratio of speed in first period of dark over speed in last period of light
   \item frzA - acceleration during freeze, dark-light, transition
   \item frzF - freeze factor, ratio of speed in first period of light over speed in last period of acclimation
